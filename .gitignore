@@ -1,0 +1,12 @@
+# Editor Leftovers
+.DS_Store
+.vscode
+.idea
+
+# data folders
+data
+
+# sub git projects
+gno
+supernova
+tx-indexer

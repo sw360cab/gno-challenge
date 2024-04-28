@@ -1,0 +1,56 @@
+services:
+  # gno.key:
+
+  gnoland:
+    build:
+      context: gno/
+      dockerfile: Dockerfile
+    environment:
+      - LOG_LEVEL=4
+    command:
+      - gnoland
+      - start
+      - --skip-failing-genesis-txs
+      - --log-level=info
+    volumes:
+      - "./data/gnoland:/opt/gno/src/gno.land/gnoland-data"
+    ports:
+      - 36657:36657
+      - 26657:26657
+
+  gnoweb:
+    build:
+      context: gno/
+      dockerfile: Dockerfile
+    command:
+      - gnoweb
+      - --bind=0.0.0.0:8080
+      - --remote=gnoland:26657
+    ports:
+      - 8080:8080
+    # volumes:
+    #   - "./gno/misc/deployments/staging.gno.land/overlay:/overlay:ro"
+    # links:
+    #   - gnoland
+
+  tx-indexer:
+    build:
+      context: tx-indexer/
+    volumes:
+      - ./data/tx-index:/app/indexer-db
+    command: start --remote http://gnoland:26657 --db-path indexer-db --listen-address 0.0.0.0:8546
+    ports:
+      - 8546:8546
+
+  supernova:
+    build:
+      context: supernova/
+      dockerfile: ../supernova.Dockerfile
+    command: >
+      -sub-accounts 5 -transactions 100 -url http://172.28.0.2:26657
+      -mnemonic "source bonus chronic canvas draft south burst lottery vacant surface solve popular case indicate oppose farm nothing bullet exhibit title speed wink action roast"
+      -output result.json
+
+  # debian:
+  #   build:
+  #     dockerfile: debian.Dockerfile
