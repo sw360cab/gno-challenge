@@ -27,7 +27,7 @@ services:
       - --bind=0.0.0.0:8080
       - --remote=gnoland:26657
     ports:
-      - 8080:8080
+      - 8088:8080
     # volumes:
     #   - "./gno/misc/deployments/staging.gno.land/overlay:/overlay:ro"
     # links:
@@ -38,19 +38,37 @@ services:
       context: tx-indexer/
     volumes:
       - ./data/tx-index:/app/indexer-db
-    command: start --remote http://gnoland:26657 --db-path indexer-db --listen-address 0.0.0.0:8546
+    # command: start --remote http://gnoland:26657 --db-path indexer-db --listen-address 0.0.0.0:8546
+    command: start --remote http://test3.gno.land:36657 --db-path indexer-db --listen-address 0.0.0.0:8546
     ports:
       - 8546:8546
 
-  supernova:
-    build:
-      context: supernova/
-      dockerfile: ../supernova.Dockerfile
-    command: >
-      -sub-accounts 5 -transactions 100 -url http://172.28.0.2:26657
-      -mnemonic "source bonus chronic canvas draft south burst lottery vacant surface solve popular case indicate oppose farm nothing bullet exhibit title speed wink action roast"
-      -output result.json
+  # supernova:
+  #   build:
+  #     context: supernova/
+  #     dockerfile: ../supernova.Dockerfile
+  #   command: >
+  #     -sub-accounts 5 -transactions 100 -url http://gnoland:26657
+  #     -mnemonic "source bonus chronic canvas draft south burst lottery vacant surface solve popular case indicate oppose farm nothing bullet exhibit title speed wink action roast"
+  #     -output result.json
 
   # debian:
   #   build:
   #     dockerfile: debian.Dockerfile
+
+  houston:
+    build: houston/
+    environment:
+      - GIN_MODE=release
+    ports:
+     - '8080:8080'
+
+  grafana:
+    image: grafana/grafana:latest
+    restart: unless-stopped
+    environment:
+      - GF_INSTALL_PLUGINS=yesoreyeram-infinity-datasource
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+    ports:
+     - '3000:3000'
