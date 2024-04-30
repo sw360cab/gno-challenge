@@ -139,8 +139,8 @@ func (gqlClient *GraphQLClient) CreateGQLSubscription() error {
 
 	log.Printf("Subscription id %s:\n", subscriptionId)
 	err = client.Run()
-	if err != nil {
-		return err
-	}
+	// if err != nil {
+	// 	return err
+	// }
 	return nil
 }

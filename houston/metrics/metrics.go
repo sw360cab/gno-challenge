@@ -3,7 +3,6 @@ package metrics
 import (
 	"fmt"
 	"regexp"
-	"sort"
 	"sync"
 )
 
@@ -30,11 +29,6 @@ var (
 	realmRegExp   = regexp.MustCompile(`gno\.land\/r\/.*`)
 	packageRegExp = regexp.MustCompile(`gno\.land\/p\/.*`)
 )
-
-type DeploymentUnit struct {
-	Deployed int64
-	Called   int64
-}
 
 type TransactionMetric struct {
 	CountTx      int64
@@ -109,36 +103,22 @@ func (tm *TransactionMetric) HandleTransactionMessage(transaction Transaction) e
 		return nil
 	}
 
+	if _, ok := actionMap[packagePath]; !ok {
+		actionMap[packagePath] = DeploymentUnit{}
+	}
 	currentActionUnit := actionMap[packagePath]
 	if deployment {
-		currentActionUnit.Deployed = currentActionUnit.Deployed + 1
+		actionMap[packagePath] = DeploymentUnit{
+			Deployed: currentActionUnit.Deployed + 1,
+			Called:   currentActionUnit.Called,
+		}
 	} else {
-		currentActionUnit.Called = currentActionUnit.Called + 1
+		actionMap[packagePath] = DeploymentUnit{
+			Deployed: currentActionUnit.Deployed,
+			Called:   currentActionUnit.Called + 1,
+		}
 	}
 	return nil
-}
-
-type SlicedMap struct {
-	Key   string `json:"key"`
-	Value int64  `json:"value"`
-}
-
-type mapCoverter func(map[string]int64) []SlicedMap
-
-func defaultMapConverter(thisMap map[string]int64) []SlicedMap {
-	var keyValued []SlicedMap
-	for k, v := range thisMap {
-		keyValued = append(keyValued, SlicedMap{k, v})
-	}
-	return keyValued
-}
-
-func (tm *TransactionMetric) sortKV(unorderedKv []SlicedMap) []SlicedMap {
-	keyValued := unorderedKv
-	sort.SliceStable(keyValued, func(i, j int) bool {
-		return keyValued[i].Value > keyValued[j].Value
-	})
-	return keyValued
 }
 
 // Aggregation Methods
@@ -151,63 +131,34 @@ func (tm *TransactionMetric) GetTransactionCount() int64 {
 func (tm *TransactionMetric) GetTransactionSuccessRate() float64 {
 	tm.mu.Lock()
 	defer tm.mu.Unlock()
+	if tm.CountTx == 0 {
+		return 0
+	}
 	return float64((tm.SuccessTx * 100) / tm.CountTx)
 }
-
-// func (tm *TransactionMetric) GetTransactionOutcomeTypes() []SlicedMap {
-// 	tm.mu.Lock()
-// 	defer tm.mu.Unlock()
-// 	kv := []SlicedMap{}
-// 	kv = append(kv,
-// 		SlicedMap{
-// 			Key:   "success",
-// 			Value: tm.SuccessTx,
-// 		},
-// 		SlicedMap{
-// 			Key:   "failure",
-// 			Value: tm.CountTx - tm.SuccessTx,
-// 		})
-// 	return kv
-// }
 
 func (tm *TransactionMetric) GetMessageTypes() []SlicedMap {
 	// tm.mu.Lock()
 	// defer tm.mu.Unlock()
-	return tm.sortKV(defaultMapConverter(tm.MessageTypes))
+	return SortKV(DefaultMapConverter(tm.MessageTypes))
 }
 
 func (tm *TransactionMetric) GetTopTransactionSenders() []SlicedMap {
-	return tm.sortKV(defaultMapConverter(tm.Senders))
+	return SortKV(DefaultMapConverter(tm.Senders))
 }
 
 func (tm *TransactionMetric) GetMostActiveRealmsDeployed() []SlicedMap {
-	var keyValued []SlicedMap
-	for k, v := range tm.Realms {
-		keyValued = append(keyValued, SlicedMap{k, int64(v.Deployed)})
-	}
-	return tm.sortKV(keyValued)
+	return SortKV(DeployedMapConverter(tm.Realms))
 }
 
 func (tm *TransactionMetric) GetMostActiveRealmsCalled() []SlicedMap {
-	var keyValued []SlicedMap
-	for k, v := range tm.Realms {
-		keyValued = append(keyValued, SlicedMap{k, int64(v.Called)})
-	}
-	return tm.sortKV(keyValued)
+	return SortKV(CalledMapConverter(tm.Realms))
 }
 
 func (tm *TransactionMetric) GetMostActivePackagesDeployed() []SlicedMap {
-	var keyValued []SlicedMap
-	for k, v := range tm.Packages {
-		keyValued = append(keyValued, SlicedMap{k, int64(v.Deployed)})
-	}
-	return tm.sortKV(keyValued)
+	return SortKV(DeployedMapConverter(tm.Packages))
 }
 
 func (tm *TransactionMetric) GetMostActivePackagesCalled() []SlicedMap {
-	var keyValued []SlicedMap
-	for k, v := range tm.Packages {
-		keyValued = append(keyValued, SlicedMap{k, int64(v.Called)})
-	}
-	return tm.sortKV(keyValued)
+	return SortKV(CalledMapConverter(tm.Packages))
 }
