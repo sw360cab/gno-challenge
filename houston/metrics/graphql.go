@@ -8,6 +8,7 @@ package metrics
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/hasura/go-graphql-client"
 	"github.com/hasura/go-graphql-client/pkg/jsonutil"
@@ -18,6 +19,7 @@ const DEFAULT_GRAPHQL_URL string = "http://127.0.0.1:8546/graphql/query"
 
 // {
 //   transactions(filter: {message: {route: vm}}) {
+//     success
 //     messages {
 //       route
 //       typeUrl
@@ -44,6 +46,8 @@ type MsgType string
 
 const msgAddPackage MsgType = "MsgAddPackage"
 const msgCall MsgType = "MsgCall"
+const msgRun MsgType = "MsgRun"
+const bankMsgSend MsgType = "BankMsgSend"
 
 type Message struct {
 	Route   string
@@ -62,6 +66,12 @@ type Message struct {
 			PkgPath string `graphql:"pkg_path"`
 			Func    string
 		} `graphql:"... on MsgCall"`
+		MsgRun struct {
+			Caller string
+		} `graphql:"... on MsgRun"`
+		BankMsgSend struct {
+			FromAddress string `graphql:"from_address"`
+		} `graphql:"... on BankMsgSend"`
 	}
 }
 
@@ -69,10 +79,11 @@ type Transaction struct {
 	Messages []Message
 	Index    int
 	Hash     string
+	Success  bool
 }
 
 type GraphQLQuery struct {
-	Transactions []Transaction `graphql:"transactions(filter: {message: {route: vm}})"`
+	Transactions []Transaction `graphql:"transactions(filter: {})"`
 }
 
 type SubscriptionResponse struct {
@@ -108,13 +119,13 @@ func (gqlClient *GraphQLClient) CreateGQLSubscription() error {
 	subscriptionId, err := client.Subscribe(&subscriptionRequest, nil, func(dataValue []byte, errValue error) error {
 		if errValue != nil {
 			// if returns error, it will failback to `onError` event
-			fmt.Println("Problem from subscription callback:" + errValue.Error())
+			log.Println("Problem from subscription callback:" + errValue.Error())
 			return nil
 		}
 		data := SubscriptionResponse{}
 		err := jsonutil.UnmarshalGraphQL(dataValue, &data)
 		if err != nil {
-			fmt.Println("Problem receiving obj:" + err.Error())
+			log.Println("Problem receiving obj:" + err.Error())
 		}
 
 		gqlClient.SubscriptionResponseHandler.HandleTransactionMessage(data.Transactions)
@@ -122,11 +133,14 @@ func (gqlClient *GraphQLClient) CreateGQLSubscription() error {
 	})
 
 	if err != nil {
-		fmt.Println("Subscription:" + err.Error())
+		log.Println("Subscription:" + err.Error())
 		return err
 	}
 
-	fmt.Printf("Subscription id %s:\n", subscriptionId)
-	client.Run()
+	log.Printf("Subscription id %s:\n", subscriptionId)
+	err = client.Run()
+	if err != nil {
+		return err
+	}
 	return nil
 }

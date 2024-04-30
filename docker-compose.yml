@@ -36,8 +36,8 @@ services:
   tx-indexer:
     build:
       context: tx-indexer/
-    volumes:
-      - ./data/tx-index:/app/indexer-db
+    # volumes:
+    #   - ./data/tx-index:/app/indexer-db
     # command: start --remote http://gnoland:26657 --db-path indexer-db --listen-address 0.0.0.0:8546
     command: start --remote http://test3.gno.land:36657 --db-path indexer-db --listen-address 0.0.0.0:8546
     ports:
@@ -60,6 +60,7 @@ services:
     build: houston/
     environment:
       - GIN_MODE=release
+      - GRAPHQL_URL=http://tx-indexer:8546/graphql/query
     ports:
      - '8080:8080'
 
