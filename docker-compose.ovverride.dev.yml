@@ -1,0 +1,11 @@
+services:
+
+  tx-indexer:
+    # Publish port to test GraphQL server
+    ports:
+      - 8546:8546
+
+  houston:
+    # Publish port to test purposes
+    ports:
+     - '8080:8080'

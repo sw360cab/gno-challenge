@@ -7,14 +7,13 @@ networks:
   dash-net:
 
 secrets:
-  grafana-sec:
+  grafana0:
     file: ./grafana/grafana.ini
 
 services:
   gnoland:
-    build:
-      context: gno/
-      dockerfile: Dockerfile
+    image: sw360cab/aib-gnoland
+    restart: unless-stopped
     command:
       - gnoland
       - start
@@ -29,9 +28,7 @@ services:
     #   - 26657:26657
 
   gnoweb:
-    build:
-      context: gno/
-      dockerfile: Dockerfile
+    image: sw360cab/aib-gnoland
     command:
       - gnoweb
       - --bind=0.0.0.0:8088
@@ -43,20 +40,15 @@ services:
       - 8088:8088
 
   tx-indexer:
-    build:
-      context: tx-indexer/
+    image: sw360cab/aib-tx-indexer
+    restart: unless-stopped
     # command: start --remote http://test3.gno.land:36657 --db-path indexer-db --listen-address 0.0.0.0:8546
     command: start --remote http://gnoland:26657 --db-path indexer-db --listen-address 0.0.0.0:8546
-    # Publish port to test GraphQL server
     networks:
       - gnoland-net
-    ports:
-      - 8546:8546
-
+ 
   supernova:
-    build:
-      context: supernova/
-      dockerfile: ../supernova.Dockerfile
+    image: sw360cab/aib-supernova
     command: >
       -sub-accounts 5 -transactions 1000 -url http://gnoland:26657
       -mnemonic "source bonus chronic canvas draft south burst lottery vacant surface solve popular case indicate oppose farm nothing bullet exhibit title speed wink action roast"
@@ -72,33 +64,18 @@ services:
     networks:
       - gnoland-net
       - dash-net
-    # Publish port to test purposes
-    ports:
-     - '8080:8080'
 
   grafana:
-    image: grafana/grafana:latest # 10.4.2
-    restart: unless-stopped
-    environment:
-      - GF_INSTALL_PLUGINS=yesoreyeram-infinity-datasource
-    networks:
-      - dash-net
-    volumes:
-      - ./data/grafana:/var/lib/grafana
-    ports:
-     - '3001:3000'
-
-  grafana2:
     image: grafana/grafana:10.4.2
     restart: unless-stopped
     environment:
       - GF_INSTALL_PLUGINS=yesoreyeram-infinity-datasource
-      # - GF_SECURITY_ADMIN_PASSWORD__FILE=/run/secrets/grafana-sec
+      - GF_SECURITY_ADMIN_PASSWORD__FILE=/run/secrets/grafana0
     secrets:
-      - grafana-sec
+      - grafana0
     volumes:
       - grafana-vol:/var/lib/grafana
-      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+      # - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
     networks:
       - dash-net
     ports:
