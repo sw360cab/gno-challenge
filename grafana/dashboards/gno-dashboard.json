@@ -1,0 +1,729 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 1,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "fdk6378v9pce8f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "10.4.2",
+      "targets": [
+        {
+          "columns": [],
+          "data": "{\"count\":5}",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "fdk6378v9pce8f"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "http://houston:8080/count",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "Total transactions",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "fdk6378v9pce8f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "displayName": "${__field.key}",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 18,
+        "x": 6,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "displayMode": "lcd",
+        "maxVizHeight": 60,
+        "minVizHeight": 17,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "",
+          "values": true
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      },
+      "pluginVersion": "10.4.2",
+      "targets": [
+        {
+          "columns": [],
+          "data": "[{\"key\":\"g1c4f5pn9zatmyxrndncv3zsq8qmk33vf4g9gm7h\",\"value\":1},{\"key\":\"g1plxd74hnxyjvh309nfcndp53ypvv93yp5rd7dk\",\"value\":1},{\"key\":\"g1fsu3z335h5qngf7t3lmakvpmpwg9ae76tqwh7c\",\"value\":1},{\"key\":\"g14dwzcyj6rt4yqnx7jgm6ue2xazwsp4pfha86pp\",\"value\":1},{\"key\":\"g1q6cyzwgk7hk8jcgvcva0ry4uv23fm2twtzk35t\",\"value\":1},{\"key\":\"g13enw4ph4jwh2mqv07pxcsesyam5605cydps77n\",\"value\":1},{\"key\":\"g1u7y667z64x2h7vc6fmpcprgey4ck233jaww9zq\",\"value\":3},{\"key\":\"g1gzryacsweexf6u4uqsf7djmtzq9pfwwkuyt4kn\",\"value\":3},{\"key\":\"g14qvahvnnllzwl9ehn3mkph248uapsehwgfe4pt\",\"value\":4},{\"key\":\"g1jg8mtutu9khhfwc4nxmuhcpftf0pajdhfvsqf5\",\"value\":7},{\"key\":\"g14vhcdsyf83ngsrrqc92kmw8q9xakqjm0v8448t\",\"value\":11}]",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "fdk6378v9pce8f"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "http://houston:8080/senders",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "Top Senders",
+      "transformations": [
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "desc": true,
+                "field": "value"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "fdk6378v9pce8f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 0,
+        "y": 8
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "/.*/",
+          "values": true
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.4.2",
+      "targets": [
+        {
+          "columns": [],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "fdk6378v9pce8f"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "json_options": {
+            "root_is_not_array": true
+          },
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "http://houston:8080/successRate",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "Success Rate",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "fdk6378v9pce8f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "displayName": "${__field.key}",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 9,
+        "x": 6,
+        "y": 8
+      },
+      "id": 5,
+      "options": {
+        "displayMode": "lcd",
+        "maxVizHeight": 164,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "",
+          "values": true
+        },
+        "showUnfilled": true,
+        "sizing": "manual",
+        "valueMode": "color"
+      },
+      "pluginVersion": "10.4.2",
+      "targets": [
+        {
+          "columns": [],
+          "data": "[{\"key\":\"g1c4f5pn9zatmyxrndncv3zsq8qmk33vf4g9gm7h\",\"value\":1},{\"key\":\"g1plxd74hnxyjvh309nfcndp53ypvv93yp5rd7dk\",\"value\":1},{\"key\":\"g1fsu3z335h5qngf7t3lmakvpmpwg9ae76tqwh7c\",\"value\":1},{\"key\":\"g14dwzcyj6rt4yqnx7jgm6ue2xazwsp4pfha86pp\",\"value\":1},{\"key\":\"g1q6cyzwgk7hk8jcgvcva0ry4uv23fm2twtzk35t\",\"value\":1},{\"key\":\"g13enw4ph4jwh2mqv07pxcsesyam5605cydps77n\",\"value\":1},{\"key\":\"g1u7y667z64x2h7vc6fmpcprgey4ck233jaww9zq\",\"value\":3},{\"key\":\"g1gzryacsweexf6u4uqsf7djmtzq9pfwwkuyt4kn\",\"value\":3},{\"key\":\"g14qvahvnnllzwl9ehn3mkph248uapsehwgfe4pt\",\"value\":4},{\"key\":\"g1jg8mtutu9khhfwc4nxmuhcpftf0pajdhfvsqf5\",\"value\":7},{\"key\":\"g14vhcdsyf83ngsrrqc92kmw8q9xakqjm0v8448t\",\"value\":11}]",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "fdk6378v9pce8f"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "http://houston:8080/realms/deployed",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "Top Realms Deployed",
+      "transformations": [
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "desc": true,
+                "field": "value"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "fdk6378v9pce8f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "displayName": "${__field.key}",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 9,
+        "x": 15,
+        "y": 8
+      },
+      "id": 6,
+      "options": {
+        "displayMode": "lcd",
+        "maxVizHeight": 164,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "",
+          "values": true
+        },
+        "showUnfilled": true,
+        "sizing": "manual",
+        "valueMode": "color"
+      },
+      "pluginVersion": "10.4.2",
+      "targets": [
+        {
+          "columns": [],
+          "data": "[{\"key\":\"g1c4f5pn9zatmyxrndncv3zsq8qmk33vf4g9gm7h\",\"value\":1},{\"key\":\"g1plxd74hnxyjvh309nfcndp53ypvv93yp5rd7dk\",\"value\":1},{\"key\":\"g1fsu3z335h5qngf7t3lmakvpmpwg9ae76tqwh7c\",\"value\":1},{\"key\":\"g14dwzcyj6rt4yqnx7jgm6ue2xazwsp4pfha86pp\",\"value\":1},{\"key\":\"g1q6cyzwgk7hk8jcgvcva0ry4uv23fm2twtzk35t\",\"value\":1},{\"key\":\"g13enw4ph4jwh2mqv07pxcsesyam5605cydps77n\",\"value\":1},{\"key\":\"g1u7y667z64x2h7vc6fmpcprgey4ck233jaww9zq\",\"value\":3},{\"key\":\"g1gzryacsweexf6u4uqsf7djmtzq9pfwwkuyt4kn\",\"value\":3},{\"key\":\"g14qvahvnnllzwl9ehn3mkph248uapsehwgfe4pt\",\"value\":4},{\"key\":\"g1jg8mtutu9khhfwc4nxmuhcpftf0pajdhfvsqf5\",\"value\":7},{\"key\":\"g14vhcdsyf83ngsrrqc92kmw8q9xakqjm0v8448t\",\"value\":11}]",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "fdk6378v9pce8f"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "http://houston:8080/realms/called",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "Top Realms Called",
+      "transformations": [
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "desc": true,
+                "field": "value"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "fdk6378v9pce8f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "displayName": "${__field.key}",
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 0,
+        "y": 15
+      },
+      "id": 3,
+      "options": {
+        "displayLabels": [
+          "percent",
+          "name"
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "hidden",
+          "placement": "right",
+          "showLegend": false,
+          "values": []
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.4.2",
+      "targets": [
+        {
+          "columns": [],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "fdk6378v9pce8f"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "http://houston:8080/messageTypes",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "Message types",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "fdk6378v9pce8f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "displayName": "${__field.key}",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 9,
+        "x": 6,
+        "y": 15
+      },
+      "id": 7,
+      "options": {
+        "displayMode": "lcd",
+        "maxVizHeight": 164,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "",
+          "values": true
+        },
+        "showUnfilled": true,
+        "sizing": "manual",
+        "valueMode": "color"
+      },
+      "pluginVersion": "10.4.2",
+      "targets": [
+        {
+          "columns": [],
+          "data": "[{\"key\":\"g1c4f5pn9zatmyxrndncv3zsq8qmk33vf4g9gm7h\",\"value\":1},{\"key\":\"g1plxd74hnxyjvh309nfcndp53ypvv93yp5rd7dk\",\"value\":1},{\"key\":\"g1fsu3z335h5qngf7t3lmakvpmpwg9ae76tqwh7c\",\"value\":1},{\"key\":\"g14dwzcyj6rt4yqnx7jgm6ue2xazwsp4pfha86pp\",\"value\":1},{\"key\":\"g1q6cyzwgk7hk8jcgvcva0ry4uv23fm2twtzk35t\",\"value\":1},{\"key\":\"g13enw4ph4jwh2mqv07pxcsesyam5605cydps77n\",\"value\":1},{\"key\":\"g1u7y667z64x2h7vc6fmpcprgey4ck233jaww9zq\",\"value\":3},{\"key\":\"g1gzryacsweexf6u4uqsf7djmtzq9pfwwkuyt4kn\",\"value\":3},{\"key\":\"g14qvahvnnllzwl9ehn3mkph248uapsehwgfe4pt\",\"value\":4},{\"key\":\"g1jg8mtutu9khhfwc4nxmuhcpftf0pajdhfvsqf5\",\"value\":7},{\"key\":\"g14vhcdsyf83ngsrrqc92kmw8q9xakqjm0v8448t\",\"value\":11}]",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "fdk6378v9pce8f"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "http://houston:8080/packages/deployed",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "Top Packages Deployed",
+      "transformations": [
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "desc": true,
+                "field": "value"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "fdk6378v9pce8f"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "displayName": "${__field.key}",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 9,
+        "x": 15,
+        "y": 15
+      },
+      "id": 8,
+      "options": {
+        "displayMode": "lcd",
+        "maxVizHeight": 164,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "left",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "",
+          "values": true
+        },
+        "showUnfilled": true,
+        "sizing": "manual",
+        "valueMode": "color"
+      },
+      "pluginVersion": "10.4.2",
+      "targets": [
+        {
+          "columns": [],
+          "data": "[{\"key\":\"g1c4f5pn9zatmyxrndncv3zsq8qmk33vf4g9gm7h\",\"value\":1},{\"key\":\"g1plxd74hnxyjvh309nfcndp53ypvv93yp5rd7dk\",\"value\":1},{\"key\":\"g1fsu3z335h5qngf7t3lmakvpmpwg9ae76tqwh7c\",\"value\":1},{\"key\":\"g14dwzcyj6rt4yqnx7jgm6ue2xazwsp4pfha86pp\",\"value\":1},{\"key\":\"g1q6cyzwgk7hk8jcgvcva0ry4uv23fm2twtzk35t\",\"value\":1},{\"key\":\"g13enw4ph4jwh2mqv07pxcsesyam5605cydps77n\",\"value\":1},{\"key\":\"g1u7y667z64x2h7vc6fmpcprgey4ck233jaww9zq\",\"value\":3},{\"key\":\"g1gzryacsweexf6u4uqsf7djmtzq9pfwwkuyt4kn\",\"value\":3},{\"key\":\"g14qvahvnnllzwl9ehn3mkph248uapsehwgfe4pt\",\"value\":4},{\"key\":\"g1jg8mtutu9khhfwc4nxmuhcpftf0pajdhfvsqf5\",\"value\":7},{\"key\":\"g14vhcdsyf83ngsrrqc92kmw8q9xakqjm0v8448t\",\"value\":11}]",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "fdk6378v9pce8f"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "http://houston:8080/packages/called",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "Top Packages Called",
+      "transformations": [
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "desc": true,
+                "field": "value"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "bargauge"
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-5m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Gnoland Dashboard",
+  "uid": "edk9jhvd1xon4b",
+  "version": 7,
+  "weekStart": ""
+}
