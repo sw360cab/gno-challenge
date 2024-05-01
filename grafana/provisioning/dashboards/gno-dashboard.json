@@ -160,6 +160,7 @@
           },
           "filters": [],
           "format": "table",
+          "parser": "backend",
           "global_query_id": "",
           "refId": "A",
           "root_selector": "",
