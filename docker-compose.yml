@@ -4,10 +4,12 @@ volumes:
 
 networks:
   gnoland-net:
+    driver: bridge
   dash-net:
+    driver: bridge
 
 secrets:
-  grafana0:
+  grafana-sec:
     file: ./grafana/grafana.ini
 
 services:
@@ -35,7 +37,6 @@ services:
       - --remote=gnoland:26657
     networks:
       - gnoland-net
-      - dash-net
     ports:
       - 8088:8088
 
@@ -70,12 +71,12 @@ services:
     restart: unless-stopped
     environment:
       - GF_INSTALL_PLUGINS=yesoreyeram-infinity-datasource
-      - GF_SECURITY_ADMIN_PASSWORD__FILE=/run/secrets/grafana0
+      - GF_SECURITY_ADMIN_PASSWORD__FILE=/run/secrets/grafana-sec
     secrets:
-      - grafana0
+      - grafana-sec
     volumes:
       - grafana-vol:/var/lib/grafana
-      # - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/provisioning:/etc/grafana/provisioning
     networks:
       - dash-net
     ports:

@@ -8,8 +8,7 @@ Solution to GNO challenge by Sergio Matone
 
 ## Preliminary steps
 
-* create the `ini` file `grafana/grafana.ini` using as template `grafana/sample.ini`
-(it contains the credentials to access Grafana Dashboard)
+* create the file `grafana/grafana.ini` containing the plain text password for Grafana dashboard
 
 ## Running
 

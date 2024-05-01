@@ -132,6 +132,7 @@
         "y": 0
       },
       "id": 1,
+      "interval": "5s",
       "options": {
         "displayMode": "lcd",
         "maxVizHeight": 60,
