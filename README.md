@@ -1,6 +1,9 @@
 # Drifting through the Cosmos
 
-Solution to GNO challenge by Sergio Matone
+Solution to GNO challenge by Sergio Matone.
+The purpose of the challenge is to visually display aggregated data of blockchain transactions.
+
+![Banner](.github/demo.gif)
 
 ## Prerequisites
 
