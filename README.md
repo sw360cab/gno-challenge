@@ -30,15 +30,17 @@ That is because we will use `supernova` as stress test and launch it multiple ti
 docker compose run --rm supernova
 ```
 
-  Or
+  Or with specific parameters
 
 ```bash
 docker compose run --rm supernova -sub-accounts 5 -transactions 500 -url http://gnoland:26657 -mode REALM_CALL
 -mnemonic "source bonus chronic canvas draft south burst lottery vacant surface solve popular case indicate oppose farm nothing bullet exhibit title speed wink action roast"
 ```
 
-* Visit the Grafana dashboard at `http://127.0.0.1:3000/`
+* Check out the Grafana dashboard by visiting `http://127.0.0.1:3000/dashboards` and after logging in navigate to the `Gnoland Dashboard`
 (use the credentials defined into `grafana.ini` file)
+
+Eventually run more stress tests to see panels of the dashboard getting updated in real time.
 
 ## Cleanup
 

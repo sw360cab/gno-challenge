@@ -1,10 +1,13 @@
 # Assuptions & Limitations
 
+## Design decisions
+
 * it is covered a single chain id at the moment
 * the current implementation is focusing on processing transaction metrics from block 1
 * it is supposed having a single instance of `tx-indexer` service
 * multiple instances of `gnoland` service are subject to how `tx-indexer` service is able to handle them
 * there is a single instance of houston, which is referring to the `tx-indexer` as single source of truth
+* docker compose services are designed to employ `command` directive, so that the arguments of each service can be easily overridden
 
 ## Gnoland
 
@@ -34,5 +37,6 @@ This decision should be picked with care to avoid over engineering the architect
 * in order to add more metrics it is enough to add more methods to the interface and to expose the relative HTTP endpoint
 * storing metrics in-memory does not scale well, a decision should be taken in the direction of avoid bloating memory.
 On the other hand it should be avoided to introduce a new level of persistence beyond the `tx-indexer`
-* using hash map to model most of the aggregatated data should be taken into account to optimize performance of
+* data structure employed to model aggregated metrics should be carefully chose. Hash maps are suitable in a demo-like scenario,
+but may become unfit when dealing for example with multiple chains of blocks.
 * initial query of per-existing data should be scaled by paginating somehow the requests to `tx-indexer`

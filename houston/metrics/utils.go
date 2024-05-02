@@ -18,7 +18,11 @@ func DefaultMapConverter(thisMap map[string]int64) []SlicedMap {
 func SortKV(unorderedKv []SlicedMap) []SlicedMap {
 	keyValued := unorderedKv
 	sort.SliceStable(keyValued, func(i, j int) bool {
-		return keyValued[i].Value >= keyValued[j].Value
+		if keyValued[i].Value == keyValued[j].Value {
+			// handle same value conflict using key in alphanum order
+			return keyValued[i].Key < keyValued[j].Key
+		}
+		return keyValued[i].Value > keyValued[j].Value
 	})
 	return keyValued
 }
