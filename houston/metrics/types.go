@@ -1,5 +1,7 @@
 package metrics
 
+import "time"
+
 type DeploymentUnit struct {
 	Deployed int64
 	Called   int64
@@ -110,7 +112,7 @@ type LeftoversTransactionFilter struct {
 type LastBlockBeforeTimeFilter struct {
 	FromHeight int64
 	ToHeight   int64
-	ToTime     string
+	ToTime     time.Time
 }
 
 // GraphQL Client related types

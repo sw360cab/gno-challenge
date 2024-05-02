@@ -33,12 +33,20 @@ docker compose run --rm supernova
   Or
 
 ```bash
-docker-compose run --rm supernova -sub-accounts 5 -transactions 500 -url http://gnoland:26657 -mode REALM_CALL
+docker compose run --rm supernova -sub-accounts 5 -transactions 500 -url http://gnoland:26657 -mode REALM_CALL
 -mnemonic "source bonus chronic canvas draft south burst lottery vacant surface solve popular case indicate oppose farm nothing bullet exhibit title speed wink action roast"
 ```
 
 * Visit the Grafana dashboard at `http://127.0.0.1:3000/`
 (use the credentials defined into `grafana.ini` file)
+
+## Cleanup
+
+To wipe everything or start from scratch:
+
+```bash
+docker compose down -v
+```
 
 ## Services within this Cosmos
 
@@ -88,7 +96,7 @@ This can be also imagined as a diagram of communication between each service.
 ### Ports
 
 Only essential ports are exposed, however for dev purposes more ports may be needed.
-To achieve that instead of modifying the `docker-compose` file use a further compose file to be [merged](https://docs.docker.com/compose/multiple-compose-files/merge/)
+To achieve that instead of modifying the `docker-compose.yml` file use a further compose file to be [merged](https://docs.docker.com/compose/multiple-compose-files/merge/)
 
 An example file is provided. Use it as following:
 

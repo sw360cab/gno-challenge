@@ -1,7 +1,7 @@
 package metrics
 
 // The purpose of this package is to model GraphQL Transactions
-// according to "github.com/gnolang/tx-indexer/serve/graph/model"
+// according to "https://github.com/gnolang/tx-indexer/tree/main/serve/graph/model"
 // and to the schema types in `https://github.com/gnolang/tx-indexer/tree/main/serve/graph/schema`.
 // The objects can be employed with the GQL client to perform queries or subscriptions
 
@@ -63,7 +63,7 @@ func (gqlClient *GraphQLClient) CreateGQLStaticQuery(leftoverBlock LeftoversTran
 	err := gqlClient.createGQLStaticQuery(map[string]interface{}{
 		"fromHeight": leftoverBlock.ToBlock,
 		"toHeight":   leftoverBlock.ToBlock + 1, // exclusive interval
-		"toTime":     bootstapTime.Format(time.RFC3339Nano),
+		"toTime":     bootstapTime,
 	}, queryLastBlockBeforeTime)
 	if err != nil {
 		return nil, err
@@ -88,7 +88,7 @@ func (gqlClient *GraphQLClient) CreateGQLStaticQuery(leftoverBlock LeftoversTran
 
 func (gqlClient *GraphQLClient) CreateGQLSubscription() error {
 	var subscriptionRequest SubscriptionGraphQLQuery
-	client := graphql.NewSubscriptionClient(gqlClient.Endpoint)
+	client := graphql.NewSubscriptionClient(gqlClient.Endpoint).WithRetryTimeout(5 * time.Minute)
 	defer client.Close()
 
 	subscriptionId, err := client.Subscribe(&subscriptionRequest, nil, func(dataValue []byte, errValue error) error {

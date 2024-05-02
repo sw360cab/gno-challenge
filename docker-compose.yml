@@ -83,7 +83,7 @@ services:
     networks:
       - dash-net
     ports:
-     - '3000:3000'
+     - 3000:3000
 
   # redis:
   #   image: redis:7-alpine
