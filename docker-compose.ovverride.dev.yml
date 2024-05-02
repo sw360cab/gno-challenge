@@ -1,4 +1,9 @@
 services:
+  gnoland:
+    ports:
+      - 36657:36657
+      - 26657:26657
+
 
   tx-indexer:
     # Publish port to test GraphQL server

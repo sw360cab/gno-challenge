@@ -1,9 +1,13 @@
 package metrics
 
 import (
+	"context"
 	"fmt"
 	"regexp"
 	"sync"
+
+	"github.com/redis/go-redis/v9"
+	"go.uber.org/zap"
 )
 
 type TransactionMetricsCollector interface {
@@ -25,35 +29,45 @@ type TransactionMetricsCollector interface {
 	GetMostActivePackagesCalled() []SlicedMap
 }
 
+const LatestBlockHeightRedisKey string = "LATEST_BLOCK_HEIGHT"
+
 var (
 	realmRegExp   = regexp.MustCompile(`gno\.land\/r\/.*`)
 	packageRegExp = regexp.MustCompile(`gno\.land\/p\/.*`)
 )
 
 type TransactionMetric struct {
-	CountTx      int64
-	SuccessTx    int64
-	MessageTypes map[string]int64
-	Senders      map[string]int64
-	Realms       map[string]DeploymentUnit
-	Packages     map[string]DeploymentUnit
-	mu           sync.Mutex
+	CountTx           int64
+	SuccessTx         int64
+	MessageTypes      map[string]int64
+	Senders           map[string]int64
+	Realms            map[string]DeploymentUnit
+	Packages          map[string]DeploymentUnit
+	LatestBlockHeight int64
+	mu                sync.Mutex
+	LatestBlockCh     chan LeftoversTransactionFilter
+	redisClient       *redis.Client
+	ctx               context.Context
+	logger            *zap.Logger
 }
 
 var _ TransactionMetricsCollector = &TransactionMetric{}
 
-func NewTransactionMetric() *TransactionMetric {
+func NewTransactionMetric(redisClient *redis.Client, logger *zap.Logger) *TransactionMetric {
 	return &TransactionMetric{
-		CountTx:      0,
-		MessageTypes: make(map[string]int64),
-		Senders:      make(map[string]int64),
-		Realms:       make(map[string]DeploymentUnit),
-		Packages:     make(map[string]DeploymentUnit),
+		MessageTypes:  make(map[string]int64),
+		Senders:       make(map[string]int64),
+		Realms:        make(map[string]DeploymentUnit),
+		Packages:      make(map[string]DeploymentUnit),
+		LatestBlockCh: make(chan LeftoversTransactionFilter),
+		ctx:           context.Background(),
+		redisClient:   redisClient,
+		logger:        logger,
 	}
 }
 
 func (tm *TransactionMetric) HandleTransactionMessage(transaction Transaction) error {
-	if len(transaction.Messages) == 0 { // should never happen
+	if len(transaction.Messages) == 0 { // this should never happen
 		return fmt.Errorf("No message found in transaction")
 	}
 	msg := transaction.Messages[0]
@@ -61,6 +75,15 @@ func (tm *TransactionMetric) HandleTransactionMessage(transaction Transaction) e
 	tm.mu.Lock()
 	defer tm.mu.Unlock()
 
+	tm.logger.Debug("Transaction received", zap.String("transaction", fmt.Sprintf("%v", transaction)))
+	// handle first transaction received
+	// check pre-existing blocks not handled yet
+	if tm.CountTx == 0 {
+		tm.LatestBlockCh <- LeftoversTransactionFilter{
+			ToBlock: transaction.BlockHeight,
+			ToIndex: transaction.Index,
+		}
+	}
 	// update total
 	tm.CountTx++
 	// update success
@@ -118,8 +141,37 @@ func (tm *TransactionMetric) HandleTransactionMessage(transaction Transaction) e
 			Called:   currentActionUnit.Called + 1,
 		}
 	}
+	// // update Latest Block Height
+	// if tm.LatestBlockHeight > transaction.BlockHeight {
+	// 	tm.LatestBlockHeight = transaction.BlockHeight
+	// 	// TODO: ignore redis error at the moment
+	// 	tm.redisClient.Set(tm.ctx, LatestBlockHeightRedisKey, tm.LatestBlockHeight, 0)
+	// }
 	return nil
 }
+
+// // attempt to fetch last value from redis
+// func (tm *TransactionMetric) FetchLatestBlockFromRedis() error {
+// 	if tm.CountTx > 0 {
+// 		return nil
+// 	}
+
+// 	val, err := tm.redisClient.Get(tm.ctx, LatestBlockHeightRedisKey).Result()
+// 	if err != nil {
+// 		close(tm.LatestBlockCh)
+// 		return err
+// 	}
+// 	toBlock, err := strconv.ParseInt(val, 10, 64)
+// 	if err != nil {
+// 		close(tm.LatestBlockCh)
+// 		return err
+// 	}
+// 	tm.LatestBlockCh <- LeftoversTransactionFilter{
+// 		ToBlock: toBlock,
+// 		ToIndex: 0,
+// 	}
+// 	return nil
+// }
 
 // Aggregation Methods
 func (tm *TransactionMetric) GetTransactionCount() int64 {

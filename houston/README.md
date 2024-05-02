@@ -12,5 +12,15 @@ There are two main items of the application:
 * a `Gin` router to expose aggregated data via HTTP endpoints to the dashboard service.
 
 Concurrency is avoided by protecting the `critical section` with exclusive access (Mutex).
-This section is the handler of the GraphQL subscrition which receives new data and
-updates internal data structures whenever a new transaction is received in the transaction indexer.
+This section is the handler of the responses by the GraphQL server, it is in charge of updating internal data structures whenever a new transaction is received in the `transaction indexer`.
+
+## GraphQL
+
+The application deals with the GraphQL server at two different levels:
+
+* an event driven level, which intercepts transactions received on the `transaction indexer` in (near) real-time
+* a static query level, which is in charge of gathering pre-existing data in case the application may crash
+
+## Assumptions & Limitations
+
+Check [Assumptions.md](../Assumptions.md#houston)
