@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/sw360cab/gno-devops/graphql"
 	"github.com/sw360cab/gno-devops/metrics"
 	"github.com/sw360cab/gno-devops/router"
 	"github.com/sw360cab/gno-devops/utils"
@@ -35,8 +36,8 @@ func main() {
 	ginRouter.GET("/:type/:status", ginRouteHanler.GetItemsTransctionWithStatus)
 
 	// GQL Client
-	graphqlEndpoint := utils.GetEnvWithFallback(metrics.GRAPHQL_URL_ENV, metrics.DEFAULT_GRAPHQL_URL)
-	gqlClient := metrics.GraphQLClient{
+	graphqlEndpoint := utils.GetEnvWithFallback(graphql.GRAPHQL_URL_ENV, graphql.DEFAULT_GRAPHQL_URL)
+	gqlClient := graphql.GraphQLClient{
 		Endpoint:                    graphqlEndpoint,
 		SubscriptionResponseHandler: txMetrics,
 	}
@@ -52,7 +53,10 @@ func main() {
 	// Launch GQL query for unprocessed / previous blocks
 	go func() {
 		bootstrapTime := time.Now()
-		leftoverBlock := <-txMetrics.LatestBlockCh
+		defer close(txMetrics.LatestBlockCh)
+		leftoverBlock := graphql.LeftoversTransactionFilter{
+			ToBlock: 305,
+		}
 		transactions, err := gqlClient.QueryPreExistingBlocks(leftoverBlock, bootstrapTime)
 		if err != nil {
 			logger.Error("Unable to fetch blocks before subscription",

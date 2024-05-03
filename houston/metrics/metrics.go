@@ -6,14 +6,15 @@ import (
 	"regexp"
 	"sync"
 
+	"github.com/sw360cab/gno-devops/graphql"
 	"go.uber.org/zap"
 )
 
 const LatestBlockHeightRedisKey string = "LATEST_BLOCK_HEIGHT"
 
 var (
-	realmRegExp   = regexp.MustCompile(`gno\.land\/r\/.*`)
-	packageRegExp = regexp.MustCompile(`gno\.land\/p\/.*`)
+	realmRegExp   = regexp.MustCompile(`gno\.land\/r[^\/]*\/.*`)
+	packageRegExp = regexp.MustCompile(`gno\.land\/p[^\/]*\/.*`)
 )
 
 type TransactionMetricsCollector interface {
@@ -43,7 +44,7 @@ type TransactionMetric struct {
 	Realms        map[string]DeploymentUnit
 	Packages      map[string]DeploymentUnit
 	ctx           context.Context
-	LatestBlockCh chan LeftoversTransactionFilter
+	LatestBlockCh chan graphql.LeftoversTransactionFilter
 	mu            sync.RWMutex
 	logger        *zap.Logger
 }
@@ -56,13 +57,13 @@ func NewTransactionMetric(logger *zap.Logger) *TransactionMetric {
 		Senders:       make(map[string]int64),
 		Realms:        make(map[string]DeploymentUnit),
 		Packages:      make(map[string]DeploymentUnit),
-		LatestBlockCh: make(chan LeftoversTransactionFilter),
+		LatestBlockCh: make(chan graphql.LeftoversTransactionFilter),
 		ctx:           context.Background(),
 		logger:        logger,
 	}
 }
 
-func (tm *TransactionMetric) HandleTransactionMessage(transaction Transaction) error {
+func (tm *TransactionMetric) HandleTransactionMessage(transaction graphql.Transaction) error {
 	if len(transaction.Messages) == 0 { // this should never happen
 		return fmt.Errorf("No message found in transaction")
 	}
@@ -75,7 +76,7 @@ func (tm *TransactionMetric) HandleTransactionMessage(transaction Transaction) e
 	// handle first transaction received
 	// check pre-existing blocks not handled yet
 	if tm.CountTx == 0 {
-		tm.LatestBlockCh <- LeftoversTransactionFilter{
+		tm.LatestBlockCh <- graphql.LeftoversTransactionFilter{
 			ToBlock: transaction.BlockHeight,
 			ToIndex: transaction.Index,
 		}
@@ -93,19 +94,19 @@ func (tm *TransactionMetric) HandleTransactionMessage(transaction Transaction) e
 	var deployment bool
 	var actionMap map[string]DeploymentUnit
 	switch msg.Value.TypeName {
-	case string(msgAddPackage):
+	case string(graphql.MsgAddPackage):
 		creator = msg.Value.MsgAddPackage.Creator
 		packagePath = msg.Value.MsgAddPackage.Package.Path
 		// "typeUrl": "add_package" -> Deployed
 		deployment = true
-	case string(msgCall):
+	case string(graphql.MsgCall):
 		// "typeUrl": "exec" -> Called
 		creator = msg.Value.MsgCall.Caller
 		packagePath = msg.Value.MsgCall.PkgPath
-	case string(msgRun):
+	case string(graphql.MsgRun):
 		// "typeUrl": "run"
 		creator = msg.Value.MsgRun.Caller
-	case string(bankMsgSend):
+	case string(graphql.BankMsgSend):
 		// "typeUrl": "send" -> "route": "bank"
 		creator = msg.Value.BankMsgSend.FromAddress
 	}

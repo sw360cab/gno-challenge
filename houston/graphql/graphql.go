@@ -1,4 +1,4 @@
-package metrics
+package graphql
 
 // The purpose of this package is to model GraphQL Transactions
 // according to "https://github.com/gnolang/tx-indexer/tree/main/serve/graph/model"
@@ -21,21 +21,32 @@ const (
 
 type MsgValue string
 
-const msgAddPackage MsgValue = "MsgAddPackage"
-const msgCall MsgValue = "MsgCall"
-const msgRun MsgValue = "MsgRun"
-const bankMsgSend MsgValue = "BankMsgSend"
+const MsgAddPackage MsgValue = "MsgAddPackage"
+const MsgCall MsgValue = "MsgCall"
+const MsgRun MsgValue = "MsgRun"
+const BankMsgSend MsgValue = "BankMsgSend"
 
 type TransactionMessageHandler interface {
 	HandleTransactionMessage(transaction Transaction) error
 }
+
+// // SumIntsOrFloats sums the values of map m. It supports both floats and integers
+// // as map values.
+// func SumIntsOrFloats[K comparable, V int64 | float64](m map[K]V) V {
+// 	var s V
+// 	for _, v := range m {
+// 		s += v
+// 	}
+// 	return s
+// }
 
 type GraphQLClient struct {
 	Endpoint                    string
 	SubscriptionResponseHandler TransactionMessageHandler
 }
 
-// Performs a query toward GraphQL server with
+// Performs a query toward GraphQL server given a filter and a query reference
+// where the returned object will be
 func (gqlClient *GraphQLClient) createGQLStaticQuery(filterMap map[string]interface{}, query interface{}) error {
 	client := graphql.NewClient(gqlClient.Endpoint, nil)
 	err := client.Query(context.Background(), query, filterMap)
