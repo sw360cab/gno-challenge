@@ -45,7 +45,9 @@ func (gqlClient *GraphQLClient) createGQLStaticQuery(filterMap map[string]interf
 	return nil
 }
 
-func (gqlClient *GraphQLClient) CreateGQLStaticQuery(leftoverBlock LeftoversTransactionFilter, bootstapTime time.Time) ([]Transaction, error) {
+// Handles the request of pre-existing blocks to the GraphQL server given a reference block
+// and a bootstrap time, which defines a limit for the blocks to be queried.
+func (gqlClient *GraphQLClient) QueryPreExistingBlocks(leftoverBlock LeftoversTransactionFilter, bootstapTime time.Time) ([]Transaction, error) {
 	var transactions []Transaction = []Transaction{}
 	var queryExistingBlocks *ExistingBlocksGraphQLQuery
 	var queryLeftoverBlocks *LeftoversBlocksGraphQLQuery
@@ -96,11 +98,14 @@ func (gqlClient *GraphQLClient) CreateGQLStaticQuery(leftoverBlock LeftoversTran
 	return transactions, nil
 }
 
+// Prepares and sends a subscription request to the GraphQL server.
+// It binds the callback in charge of handling incoming data.
 func (gqlClient *GraphQLClient) CreateGQLSubscription() error {
 	var subscriptionRequest SubscriptionGraphQLQuery
 	client := graphql.NewSubscriptionClient(gqlClient.Endpoint).WithRetryTimeout(5 * time.Minute)
 	defer client.Close()
 
+	// Performs the subscription with a given callback in charge of handling received data
 	subscriptionId, err := client.Subscribe(&subscriptionRequest, nil, func(dataValue []byte, errValue error) error {
 		// If the call return error, onError event will be triggered
 		// The function returns subscription ID and error. You can use subscription ID to unsubscribe the subscription
@@ -113,6 +118,7 @@ func (gqlClient *GraphQLClient) CreateGQLSubscription() error {
 			return fmt.Errorf("Problem receiving obj : %w", err)
 		}
 
+		// call the data handler
 		gqlClient.SubscriptionResponseHandler.HandleTransactionMessage(data.Transactions)
 		return nil
 	})

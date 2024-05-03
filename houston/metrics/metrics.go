@@ -44,7 +44,7 @@ type TransactionMetric struct {
 	Packages      map[string]DeploymentUnit
 	ctx           context.Context
 	LatestBlockCh chan LeftoversTransactionFilter
-	mu            sync.Mutex
+	mu            sync.RWMutex
 	logger        *zap.Logger
 }
 
@@ -142,14 +142,14 @@ func (tm *TransactionMetric) HandleTransactionMessage(transaction Transaction) e
 
 // Aggregation Methods
 func (tm *TransactionMetric) GetTransactionCount() int64 {
-	tm.mu.Lock()
-	defer tm.mu.Unlock()
+	tm.mu.RLock()
+	defer tm.mu.RUnlock()
 	return tm.CountTx
 }
 
 func (tm *TransactionMetric) GetTransactionSuccessRate() float64 {
-	tm.mu.Lock()
-	defer tm.mu.Unlock()
+	tm.mu.RLock()
+	defer tm.mu.RUnlock()
 	if tm.CountTx == 0 {
 		return 0
 	}
@@ -157,8 +157,8 @@ func (tm *TransactionMetric) GetTransactionSuccessRate() float64 {
 }
 
 func (tm *TransactionMetric) GetMessageTypes() []SlicedMap {
-	// tm.mu.Lock()
-	// defer tm.mu.Unlock()
+	tm.mu.RLock()
+	defer tm.mu.RUnlock()
 	return SortKV(DefaultSlicedMapConverter(tm.MessageTypes))
 }
 

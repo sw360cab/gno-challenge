@@ -14,42 +14,9 @@ type SlicedMap struct {
 
 type mapCoverter[V int64 | float64] func(map[string]V) []string
 
-// // SumIntsOrFloats sums the values of map m. It supports both floats and integers
-// // as map values.
-// func SumIntsOrFloats[K comparable, V int64 | float64](m map[K]V) V {
-// 	var s V
-// 	for _, v := range m {
-// 		s += v
-// 	}
-// 	return s
-// }
-
-// {
-//   transactions(filter: {message: {route: vm}}) {
-//     success
-//     messages {
-//       route
-//       typeUrl
-//       value {
-//         __typename
-//         ... on MsgAddPackage {
-//           creator
-//           package {
-//             name
-//             path
-//           }
-//         }
-//         ... on MsgCall {
-//           caller
-//           pkg_path
-//           func
-//         }
-//       }
-//     }
-//   }
-// }
-
-// GraphQL modeling
+/********************/
+/* GraphQL modeling */
+/********************/
 type Message struct {
 	Route   string
 	TypeUrl string
@@ -93,7 +60,9 @@ type SubscriptionResponse struct {
 	Transactions Transaction
 }
 
-// GraphQL queries
+/*************************/
+/* GraphQL query results */
+/*************************/
 type SubscriptionGraphQLQuery struct {
 	Transactions []Transaction `graphql:"transactions(filter: {})"`
 }
@@ -110,7 +79,9 @@ type LastBlockBeforeTimeQuery struct {
 	Blocks []Block `graphql:"blocks(filter: { from_height: $fromHeight, to_height: $toHeight, to_time: $toTime })"`
 }
 
-// GraphQL filters
+/*******************/
+/* GraphQL filters */
+/*******************/
 type ExistingTransactionFilter struct {
 	ToBlock int64
 }
@@ -124,3 +95,30 @@ type LastBlockBeforeTimeFilter struct {
 	ToHeight   int64
 	ToTime     time.Time
 }
+
+// Sample query in pure GraphQL
+//
+// {
+//   transactions(filter: {message: {route: vm}}) {
+//     success
+//     messages {
+//       route
+//       typeUrl
+//       value {
+//         __typename
+//         ... on MsgAddPackage {
+//           creator
+//           package {
+//             name
+//             path
+//           }
+//         }
+//         ... on MsgCall {
+//           caller
+//           pkg_path
+//           func
+//         }
+//       }
+//     }
+//   }
+// }

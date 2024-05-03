@@ -53,7 +53,7 @@ func main() {
 	go func() {
 		bootstrapTime := time.Now()
 		leftoverBlock := <-txMetrics.LatestBlockCh
-		transactions, err := gqlClient.CreateGQLStaticQuery(leftoverBlock, bootstrapTime)
+		transactions, err := gqlClient.QueryPreExistingBlocks(leftoverBlock, bootstrapTime)
 		if err != nil {
 			logger.Error("Unable to fetch blocks before subscription",
 				zap.Int64("last block", leftoverBlock.ToBlock),
