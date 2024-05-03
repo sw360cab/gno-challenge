@@ -12,7 +12,17 @@ type SlicedMap struct {
 	Value int64  `json:"value"`
 }
 
-type mapCoverter func(map[string]int64) []SlicedMap
+type mapCoverter[V int64 | float64] func(map[string]V) []string
+
+// // SumIntsOrFloats sums the values of map m. It supports both floats and integers
+// // as map values.
+// func SumIntsOrFloats[K comparable, V int64 | float64](m map[K]V) V {
+// 	var s V
+// 	for _, v := range m {
+// 		s += v
+// 	}
+// 	return s
+// }
 
 // {
 //   transactions(filter: {message: {route: vm}}) {
@@ -113,14 +123,4 @@ type LastBlockBeforeTimeFilter struct {
 	FromHeight int64
 	ToHeight   int64
 	ToTime     time.Time
-}
-
-// GraphQL Client related types
-type TransactionMessageHandler interface {
-	HandleTransactionMessage(transaction Transaction) error
-}
-
-type GraphQLClient struct {
-	Endpoint                    string
-	SubscriptionResponseHandler TransactionMessageHandler
 }

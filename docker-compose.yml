@@ -64,7 +64,6 @@ services:
     environment:
       - GIN_MODE=release
       - GRAPHQL_URL=http://tx-indexer:8546/graphql/query
-      # - REDIS_HOST=redis
     networks:
       - gnoland-net
       - dash-net
@@ -84,7 +83,3 @@ services:
       - dash-net
     ports:
      - 3000:3000
-
-  # redis:
-  #   image: redis:7-alpine
-  #   restart: unless-stopped

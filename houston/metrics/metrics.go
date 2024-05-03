@@ -6,8 +6,14 @@ import (
 	"regexp"
 	"sync"
 
-	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
+)
+
+const LatestBlockHeightRedisKey string = "LATEST_BLOCK_HEIGHT"
+
+var (
+	realmRegExp   = regexp.MustCompile(`gno\.land\/r\/.*`)
+	packageRegExp = regexp.MustCompile(`gno\.land\/p\/.*`)
 )
 
 type TransactionMetricsCollector interface {
@@ -29,31 +35,22 @@ type TransactionMetricsCollector interface {
 	GetMostActivePackagesCalled() []SlicedMap
 }
 
-const LatestBlockHeightRedisKey string = "LATEST_BLOCK_HEIGHT"
-
-var (
-	realmRegExp   = regexp.MustCompile(`gno\.land\/r\/.*`)
-	packageRegExp = regexp.MustCompile(`gno\.land\/p\/.*`)
-)
-
 type TransactionMetric struct {
-	CountTx           int64
-	SuccessTx         int64
-	MessageTypes      map[string]int64
-	Senders           map[string]int64
-	Realms            map[string]DeploymentUnit
-	Packages          map[string]DeploymentUnit
-	LatestBlockHeight int64
-	mu                sync.Mutex
-	LatestBlockCh     chan LeftoversTransactionFilter
-	redisClient       *redis.Client
-	ctx               context.Context
-	logger            *zap.Logger
+	CountTx       int64
+	SuccessTx     int64
+	MessageTypes  map[string]int64
+	Senders       map[string]int64
+	Realms        map[string]DeploymentUnit
+	Packages      map[string]DeploymentUnit
+	ctx           context.Context
+	LatestBlockCh chan LeftoversTransactionFilter
+	mu            sync.Mutex
+	logger        *zap.Logger
 }
 
 var _ TransactionMetricsCollector = &TransactionMetric{}
 
-func NewTransactionMetric(redisClient *redis.Client, logger *zap.Logger) *TransactionMetric {
+func NewTransactionMetric(logger *zap.Logger) *TransactionMetric {
 	return &TransactionMetric{
 		MessageTypes:  make(map[string]int64),
 		Senders:       make(map[string]int64),
@@ -61,7 +58,6 @@ func NewTransactionMetric(redisClient *redis.Client, logger *zap.Logger) *Transa
 		Packages:      make(map[string]DeploymentUnit),
 		LatestBlockCh: make(chan LeftoversTransactionFilter),
 		ctx:           context.Background(),
-		redisClient:   redisClient,
 		logger:        logger,
 	}
 }
@@ -141,37 +137,8 @@ func (tm *TransactionMetric) HandleTransactionMessage(transaction Transaction) e
 			Called:   currentActionUnit.Called + 1,
 		}
 	}
-	// // update Latest Block Height
-	// if tm.LatestBlockHeight > transaction.BlockHeight {
-	// 	tm.LatestBlockHeight = transaction.BlockHeight
-	// 	// TODO: ignore redis error at the moment
-	// 	tm.redisClient.Set(tm.ctx, LatestBlockHeightRedisKey, tm.LatestBlockHeight, 0)
-	// }
 	return nil
 }
-
-// // attempt to fetch last value from redis
-// func (tm *TransactionMetric) FetchLatestBlockFromRedis() error {
-// 	if tm.CountTx > 0 {
-// 		return nil
-// 	}
-
-// 	val, err := tm.redisClient.Get(tm.ctx, LatestBlockHeightRedisKey).Result()
-// 	if err != nil {
-// 		close(tm.LatestBlockCh)
-// 		return err
-// 	}
-// 	toBlock, err := strconv.ParseInt(val, 10, 64)
-// 	if err != nil {
-// 		close(tm.LatestBlockCh)
-// 		return err
-// 	}
-// 	tm.LatestBlockCh <- LeftoversTransactionFilter{
-// 		ToBlock: toBlock,
-// 		ToIndex: 0,
-// 	}
-// 	return nil
-// }
 
 // Aggregation Methods
 func (tm *TransactionMetric) GetTransactionCount() int64 {
@@ -192,25 +159,25 @@ func (tm *TransactionMetric) GetTransactionSuccessRate() float64 {
 func (tm *TransactionMetric) GetMessageTypes() []SlicedMap {
 	// tm.mu.Lock()
 	// defer tm.mu.Unlock()
-	return SortKV(DefaultMapConverter(tm.MessageTypes))
+	return SortKV(DefaultSlicedMapConverter(tm.MessageTypes))
 }
 
 func (tm *TransactionMetric) GetTopTransactionSenders() []SlicedMap {
-	return SortKV(DefaultMapConverter(tm.Senders))
+	return SortKV(DefaultSlicedMapConverter(tm.Senders))
 }
 
 func (tm *TransactionMetric) GetMostActiveRealmsDeployed() []SlicedMap {
-	return SortKV(DeployedMapConverter(tm.Realms))
+	return SortKV(DeployedItemsSlicedMapConverter(tm.Realms))
 }
 
 func (tm *TransactionMetric) GetMostActiveRealmsCalled() []SlicedMap {
-	return SortKV(CalledMapConverter(tm.Realms))
+	return SortKV(CalledItemsSlicedMapConverter(tm.Realms))
 }
 
 func (tm *TransactionMetric) GetMostActivePackagesDeployed() []SlicedMap {
-	return SortKV(DeployedMapConverter(tm.Packages))
+	return SortKV(DeployedItemsSlicedMapConverter(tm.Packages))
 }
 
 func (tm *TransactionMetric) GetMostActivePackagesCalled() []SlicedMap {
-	return SortKV(CalledMapConverter(tm.Packages))
+	return SortKV(CalledItemsSlicedMapConverter(tm.Packages))
 }

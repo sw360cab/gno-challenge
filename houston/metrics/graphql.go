@@ -26,9 +26,19 @@ const msgCall MsgValue = "MsgCall"
 const msgRun MsgValue = "MsgRun"
 const bankMsgSend MsgValue = "BankMsgSend"
 
-func (gqlClient *GraphQLClient) createGQLStaticQuery(existingBlock map[string]interface{}, query interface{}) error {
+type TransactionMessageHandler interface {
+	HandleTransactionMessage(transaction Transaction) error
+}
+
+type GraphQLClient struct {
+	Endpoint                    string
+	SubscriptionResponseHandler TransactionMessageHandler
+}
+
+// Performs a query toward GraphQL server with
+func (gqlClient *GraphQLClient) createGQLStaticQuery(filterMap map[string]interface{}, query interface{}) error {
 	client := graphql.NewClient(gqlClient.Endpoint, nil)
-	err := client.Query(context.Background(), query, existingBlock)
+	err := client.Query(context.Background(), query, filterMap)
 	if err != nil {
 		return err
 	}
