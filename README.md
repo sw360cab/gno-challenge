@@ -66,7 +66,7 @@ docker compose down -v
 ## Docker Images of service
 
 * `sw360cab/aib-gnoland`: `gnoland` image based on
-([Dockerfile in git repo](https://raw.githubusercontent.com/gnolang/gno/master/Dockerfile)) using code slightly modified. See [details](Assumptions.md/#gnoland)
+([Dockerfile in git repo](https://raw.githubusercontent.com/gnolang/gno/master/Dockerfile)) using code slightly modified. See [details](docs/Assumptions.md/#gnoland)
 * `sw360cab/aib-gnoweb`: same as `gnoland`
 * `sw360cab/aib-tx-indexer`: image created using git repo [`Dockerfile`](https://raw.githubusercontent.com/gnolang/tx-indexer/main/Dockerfile)
 * `sw360cab/aib-supernova`: image created using git repo source code and a custom [Dockerfile](supernova-build/supernova.Dockerfile)
@@ -129,7 +129,7 @@ The system is mostly self-healing, here are listed briefly what happens in speci
 * Houston
   * on restart:
     * dashboard stops fetching data for a while, views are reset as soon as data are fetched again
-    * pre-existing transactions are fetched back from tx-indexer (starting from block 1), as soon as new data arrives on the tx-indexer (see [limitations](Assumptions.md#houston) )
+    * pre-existing transactions are fetched back from tx-indexer (starting from block 1), as soon as new data arrives on the tx-indexer (see [limitations](docs/Assumptions.md#houston) )
   * on stop/removal: dashboard is not refreshed anymore, but UI still visible
 
 * Dashboard
@@ -138,4 +138,4 @@ The system is mostly self-healing, here are listed briefly what happens in speci
 
 ## Assumptions & Limitations
 
-Check [Assumptions.md](Assumptions.md)
+Check [docs/Assumptions.md](docs/Assumptions.md)
