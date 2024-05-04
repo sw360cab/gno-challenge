@@ -55,9 +55,7 @@ func main() {
 	go func() {
 		bootstrapTime := time.Now()
 		defer close(txMetrics.LatestBlockCh)
-		leftoverBlock := graphql.LeftoversTransactionFilter{
-			ToBlock: 305,
-		}
+		leftoverBlock := <-txMetrics.LatestBlockCh
 		transactions, err := gqlClient.QueryPreExistingBlocks(leftoverBlock, bootstrapTime)
 		if err != nil {
 			logger.Error("Unable to fetch blocks before subscription",

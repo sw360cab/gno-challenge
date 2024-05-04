@@ -38,7 +38,7 @@ docker compose run --rm supernova -sub-accounts 5 -transactions 500 -url http://
 ```
 
 * Check out the Grafana dashboard by visiting `http://127.0.0.1:3000/dashboards` and after logging in navigate to the `Gnoland Dashboard`
-(use the credentials defined into `grafana.ini` file)
+(use the password defined into `grafana.ini` file for the `admin` user)
 
 Eventually run more stress tests to see panels of the dashboard getting updated in real time.
 
