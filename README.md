@@ -33,7 +33,7 @@ docker compose run --rm supernova
   Or with specific parameters
 
 ```bash
-docker compose run --rm supernova -sub-accounts 5 -transactions 500 -url http://gnoland:26657 -mode REALM_CALL
+docker compose run --rm supernova -sub-accounts 5 -transactions 500 -url http://gnoland:26657 -mode REALM_CALL \
 -mnemonic "source bonus chronic canvas draft south burst lottery vacant surface solve popular case indicate oppose farm nothing bullet exhibit title speed wink action roast"
 ```
 

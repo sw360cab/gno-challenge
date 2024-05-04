@@ -52,7 +52,7 @@ type SubscriptionResponse struct {
 /* GraphQL query results */
 /*************************/
 type SubscriptionGraphQLQuery struct {
-	Transactions []Transaction `graphql:"transactions(filter: {})"`
+	Transactions []Transaction `graphql:"transactions(filter: { message : { route: vm } })"` // ignore bank
 }
 
 type ExistingBlocksGraphQLQuery struct {
