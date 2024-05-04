@@ -11,33 +11,33 @@ The purpose of the challenge is to visually display aggregated data of blockchai
 
 ## Preliminary steps
 
-* create the file `grafana/grafana.ini` containing the plain text password for Grafana dashboard
+* create a file `grafana/grafana.ini` containing only a plain text password for the Grafana dashboard (just a plain string no key/value, no quotes)
 
 ## Running
 
 * Bootstrap the basic configuration
 
-```bash
-docker compose up -d
-```
+  ```bash
+  docker compose up -d
+  ```
 
-This will launch all the services, but `supernova` will fail quite immediately.
-That is because we will use `supernova` as stress test and launch it multiple times.
+  This will launch all the services, but `supernova` will fail quite immediately.
+  That is because we will use `supernova` as stress test and launch it multiple times.
 
 * Launch a stress test
 
-```bash
-docker compose run --rm supernova
-```
+  ```bash
+  docker compose run --rm supernova
+  ```
 
-  Or with specific parameters
+    Or with specific parameters
 
-```bash
-docker compose run --rm supernova -sub-accounts 5 -transactions 500 -url http://gnoland:26657 -mode REALM_CALL \
--mnemonic "source bonus chronic canvas draft south burst lottery vacant surface solve popular case indicate oppose farm nothing bullet exhibit title speed wink action roast"
-```
+  ```bash
+  docker compose run --rm supernova -sub-accounts 5 -transactions 500 -url http://gnoland:26657 -mode REALM_CALL \
+  -mnemonic "source bonus chronic canvas draft south burst lottery vacant surface solve popular case indicate oppose farm nothing bullet exhibit title speed wink action roast"
+  ```
 
-* Check out the Grafana dashboard by visiting `http://127.0.0.1:3000/dashboards` and after logging in navigate to the `Gnoland Dashboard`
+* Check out the Grafana dashboard by visiting [http://127.0.0.1:3000/dashboards](http://127.0.0.1:3000/dashboards) and after logging in navigate to the `Gnoland Dashboard`
 (use the password defined into `grafana.ini` file for the `admin` user)
 
 Eventually run more stress tests to see panels of the dashboard getting updated in real time.
@@ -61,17 +61,36 @@ docker compose down -v
 
 ## Notes on Houston
 
-* Check [Houston](houston/README.md)
+* Check out [Houston](houston/README.md)
 
-## Docker Images of service
+## Docker Images related to services
 
 * `sw360cab/aib-gnoland`: `gnoland` image based on
-([Dockerfile in git repo](https://raw.githubusercontent.com/gnolang/gno/master/Dockerfile)) using code slightly modified. See [details](docs/Assumptions.md/#gnoland)
+([Dockerfile in git repo](https://github.com/gnolang/gno/blob/master/Dockerfile)) using code slightly modified. See [details](docs/Assumptions.md#gnoland)
 * `sw360cab/aib-gnoweb`: same as `gnoland`
-* `sw360cab/aib-tx-indexer`: image created using git repo [`Dockerfile`](https://raw.githubusercontent.com/gnolang/tx-indexer/main/Dockerfile)
+* `sw360cab/aib-tx-indexer`: image created using git repo [`Dockerfile`](https://github.com/gnolang/tx-indexer/blob/main/Dockerfile)
 * `sw360cab/aib-supernova`: image created using git repo source code and a custom [Dockerfile](supernova-build/supernova.Dockerfile)
 * `houston`: custom multi-stage `Dockerfile` for Go applications
 * `grafana`: official image provided by Grafana
+
+## Custom configuration
+
+The services are configured to allow customization either via environment variables or more often by specifing additional arguments to the command.
+Specifically in case of `docker compose` this was achieved specifying an `entrypoint` rather than a `command` for each configurable service.
+Moreover to avoid modifying the base `docker-compose.yml` file it is possible to specify a further compose file to be [merged](https://docs.docker.com/compose/multiple-compose-files/merge/)
+
+An example file is provided, it can be used directly or as a template for an additional override file. Use it as following:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.ovverride.dev.yml up -d
+```
+
+Examples of possible custom configurations are:
+
+* custom `toml` config file for `gnoland`
+* additional configuration parameters for `tx-indexer`
+* lower/higher log level for `houston`
+* graphql server port exposed for `tx-indexer`
 
 ## Data pipeline
 
@@ -97,14 +116,11 @@ This can be also imagined as a diagram of communication between each service.
 
 ### Ports
 
-Only essential ports are exposed, however for dev purposes more ports may be needed.
-To achieve that instead of modifying the `docker-compose.yml` file use a further compose file to be [merged](https://docs.docker.com/compose/multiple-compose-files/merge/)
+Only essential ports are exposed, however for dev purposes more ports may be needed. See [custom configuration](#custom-configuration)
 
-An example file is provided. Use it as following:
+### Secrets
 
-```bash
-docker compose -f docker-compose.yml -f docker-compose.ovverride.dev.yml up -d
-```
+A docker secret is used to provide the admin password to the grafana service.
 
 ## Crashes of services
 
@@ -138,4 +154,4 @@ The system is mostly self-healing, here are listed briefly what happens in speci
 
 ## Assumptions & Limitations
 
-Check [docs/Assumptions.md](docs/Assumptions.md)
+Check out [Assumptions](docs/Assumptions.md)

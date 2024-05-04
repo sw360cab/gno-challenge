@@ -1,5 +1,9 @@
 services:
   gnoland:
+    command: --config-path /opt/gno/src/gno.land/config/config.toml
+    volumes:
+      - gnoland-vol:/opt/gno/src/gno.land/gnoland-data
+      - ./gnoland/config.toml:/opt/gno/src/gno.land/config/config.toml
     ports:
       - 36657:36657
       - 26657:26657
@@ -16,6 +20,6 @@ services:
       - GRAPHQL_URL=http://tx-indexer:8546/graphql/query
       - GIN_MODE=release
       - LOG_LEVEL=debug
-    # Publish port to test purposes
+    # Publish port for test purposes
     ports:
      - '8080:8080'

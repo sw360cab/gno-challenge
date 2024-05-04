@@ -12,7 +12,12 @@
 ## Gnoland
 
 * It was not found a way via command line to overide the `listen address` of the RPC server.
-The value is set in the source code at `tm2/pkg/bft/rpc/config/config.go` and it can be overridden using the key `laddr` in the TOML file. However it appears not possible to create a TOML file with only this single value, and it is complicated to understand the correct values for all the other requested keys.
+The value is set in the source code at `tm2/pkg/bft/rpc/config/config.go` and it can be overridden using the key `laddr` in the TOML file.
+However it appears not possible to create a TOML file with only this single value, and it is complicated to understand the correct values for all the other requested keys.
+
+  A suggested workaround to generate a valid TOML file was to start Gnoland with the argument `--skip-start`.
+A sample of TOML file is provided in [gnoland/config.toml](../gnoland/config.toml) and can be modified and used with the current docker image
+with a [custom configuration](../README.md#custom-configuration)
 
 ## Houston
 

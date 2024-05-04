@@ -23,4 +23,4 @@ The application deals with the GraphQL server at two different levels:
 
 ## Assumptions & Limitations
 
-Check [docs/Assumptions.md](../docs/Assumptions.md#houston)
+Check out [Assumptions](../docs/Assumptions.md#houston)
