@@ -38,8 +38,9 @@ func main() {
 	// GQL Client
 	graphqlEndpoint := utils.GetEnvWithFallback(graphql.GRAPHQL_URL_ENV, graphql.DEFAULT_GRAPHQL_URL)
 	gqlClient := graphql.GraphQLClient{
-		Endpoint:                    graphqlEndpoint,
-		SubscriptionResponseHandler: txMetrics,
+		Endpoint:                     graphqlEndpoint,
+		SubscriptionResponseHandler:  txMetrics,
+		SubscriptionConnRetryTimeout: 2 * time.Minute, // configurable if a future version
 	}
 
 	// Launch GQL suscription in another GO routine

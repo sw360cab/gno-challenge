@@ -4,6 +4,8 @@ import (
 	"sort"
 )
 
+// Sorts a slice of SlicedMaps elements in DESCENDING order.
+// Items having equals Value field are sorted among them by Key field
 func SortKV(unorderedKv []SlicedMap) []SlicedMap {
 	keyValued := unorderedKv
 	sort.SliceStable(keyValued, func(i, j int) bool {

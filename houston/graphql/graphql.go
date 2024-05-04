@@ -26,23 +26,18 @@ const MsgCall MsgValue = "MsgCall"
 const MsgRun MsgValue = "MsgRun"
 const BankMsgSend MsgValue = "BankMsgSend"
 
+// Handler for subscription responses from GraphQL server
 type TransactionMessageHandler interface {
 	HandleTransactionMessage(transaction Transaction) error
 }
 
-// // SumIntsOrFloats sums the values of map m. It supports both floats and integers
-// // as map values.
-// func SumIntsOrFloats[K comparable, V int64 | float64](m map[K]V) V {
-// 	var s V
-// 	for _, v := range m {
-// 		s += v
-// 	}
-// 	return s
-// }
-
 type GraphQLClient struct {
-	Endpoint                    string
+	// GQL server endpoint
+	Endpoint string
+	// Handler for subscription callback
 	SubscriptionResponseHandler TransactionMessageHandler
+	// Retry timeout for GQL client toward subscription endpoint
+	SubscriptionConnRetryTimeout time.Duration
 }
 
 // Performs a query toward GraphQL server given a filter and a query reference
@@ -113,7 +108,9 @@ func (gqlClient *GraphQLClient) QueryPreExistingBlocks(leftoverBlock LeftoversTr
 // It binds the callback in charge of handling incoming data.
 func (gqlClient *GraphQLClient) CreateGQLSubscription() error {
 	var subscriptionRequest SubscriptionGraphQLQuery
-	client := graphql.NewSubscriptionClient(gqlClient.Endpoint).WithRetryTimeout(5 * time.Minute)
+	client := graphql.
+		NewSubscriptionClient(gqlClient.Endpoint).
+		WithRetryTimeout(gqlClient.SubscriptionConnRetryTimeout)
 	defer client.Close()
 
 	// Performs the subscription with a given callback in charge of handling received data

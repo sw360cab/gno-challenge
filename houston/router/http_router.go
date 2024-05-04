@@ -7,14 +7,19 @@ import (
 	"github.com/sw360cab/gno-devops/metrics"
 )
 
-type GinRouteHandler struct {
-	Tmc metrics.TransactionMetricsCollector
-}
-
+// Binding type for parametrized endpoints
 type ItemTransaction struct {
 	Type   string `uri:"type" binding:"required,oneof=realms packages"`
 	Status string `uri:"status" binding:"required,oneof=deployed called"`
 }
+
+type GinRouteHandler struct {
+	Tmc metrics.TransactionMetricsCollector
+}
+
+/**********************/
+/* Endpoints handlers */
+/**********************/
 
 func (r GinRouteHandler) GetTransactionCount(c *gin.Context) {
 	c.JSON(200, gin.H{
@@ -36,6 +41,9 @@ func (r GinRouteHandler) GetTopTransactionSenders(c *gin.Context) {
 	c.JSON(200, r.Tmc.GetTopTransactionSenders())
 }
 
+// Handler for parametrized endpoints
+// `/realms/(deployed|called)`
+// `/packages/(deployed|called)`
 func (r GinRouteHandler) GetItemsTransctionWithStatus(c *gin.Context) {
 	var itemTx ItemTransaction
 	if err := c.ShouldBindUri(&itemTx); err != nil {

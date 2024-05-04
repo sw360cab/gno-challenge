@@ -63,6 +63,10 @@ func NewTransactionMetric(logger *zap.Logger) *TransactionMetric {
 	}
 }
 
+// Handles a GraphQL trasaction model type and updates aggregated metrics.
+// For the very first transaction received a Block reference is sent in the internal channel,
+// allowing to fetch pre-existing data.
+// TODO: only first message of trasaction currently handled
 func (tm *TransactionMetric) HandleTransactionMessage(transaction graphql.Transaction) error {
 	if len(transaction.Messages) == 0 { // this should never happen
 		return fmt.Errorf("No message found in transaction")
@@ -113,6 +117,7 @@ func (tm *TransactionMetric) HandleTransactionMessage(transaction graphql.Transa
 	// update sender
 	tm.Senders[creator] = tm.Senders[creator] + 1
 
+	// using regexp to filter realms vs packages
 	switch {
 	case realmRegExp.MatchString(packagePath):
 		actionMap = tm.Realms
@@ -123,6 +128,8 @@ func (tm *TransactionMetric) HandleTransactionMessage(transaction graphql.Transa
 		return nil
 	}
 
+	// update stats about packages/realms deployed/called
+	// init empty unit for package path
 	if _, ok := actionMap[packagePath]; !ok {
 		actionMap[packagePath] = DeploymentUnit{}
 	}
@@ -164,6 +171,8 @@ func (tm *TransactionMetric) GetMessageTypes() []SlicedMap {
 }
 
 func (tm *TransactionMetric) GetTopTransactionSenders() []SlicedMap {
+	tm.mu.RLock()
+	defer tm.mu.RUnlock()
 	return SortKV(DefaultSlicedMapConverter(tm.Senders))
 }
 
