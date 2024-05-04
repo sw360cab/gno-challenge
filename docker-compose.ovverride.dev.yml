@@ -6,11 +6,16 @@ services:
 
 
   tx-indexer:
+    command: --log-level debug
     # Publish port to test GraphQL server
     ports:
       - 8546:8546
 
   houston:
+    environment:
+      - GRAPHQL_URL=http://tx-indexer:8546/graphql/query
+      - GIN_MODE=release
+      - LOG_LEVEL=debug
     # Publish port to test purposes
     ports:
      - '8080:8080'

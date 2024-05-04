@@ -17,7 +17,7 @@ services:
   gnoland:
     image: sw360cab/aib-gnoland
     restart: unless-stopped
-    command:
+    entrypoint:
       - gnoland
       - start
       - --skip-failing-genesis-txs
@@ -29,7 +29,7 @@ services:
 
   gnoweb:
     image: sw360cab/aib-gnoland
-    command:
+    entrypoint:
       - gnoweb
       - --bind=0.0.0.0:8088
       - --remote=gnoland:26657
@@ -41,19 +41,17 @@ services:
   tx-indexer:
     image: sw360cab/aib-tx-indexer
     restart: unless-stopped
-    # command: start --remote http://test3.gno.land:36657 --db-path /opt/indexer-db --listen-address 0.0.0.0:8546
-    command: start --remote http://gnoland:26657 --db-path /opt/indexer-db --listen-address 0.0.0.0:8546
+    # entrypoint: /usr/local/bin/indexer start --remote http://test3.gno.land:36657 --db-path /opt/indexer-db --listen-address 0.0.0.0:8546
+    entrypoint: /usr/local/bin/indexer start --remote http://gnoland:26657 --db-path /opt/indexer-db --listen-address 0.0.0.0:8546
     networks:
       - gnoland-net
     volumes:
       - indexer-vol:/opt/indexer-db
-    # ports:
-    #   - 8546:8546
  
   supernova:
     image: sw360cab/aib-supernova
     command: >
-      -sub-accounts 1 -transactions 9 -url http://gnoland:26657
+      -sub-accounts 10 -transactions 100 -url http://gnoland:26657 -mode REALM_CALL
       -mnemonic "source bonus chronic canvas draft south burst lottery vacant surface solve popular case indicate oppose farm nothing bullet exhibit title speed wink action roast"
     networks:
       - gnoland-net
@@ -62,8 +60,9 @@ services:
     build: houston/
     restart: unless-stopped
     environment:
-      - GIN_MODE=release
       - GRAPHQL_URL=http://tx-indexer:8546/graphql/query
+      - GIN_MODE=release
+      - LOG_LEVEL=info
     networks:
       - gnoland-net
       - dash-net

@@ -16,6 +16,8 @@ The value is set in the source code at `tm2/pkg/bft/rpc/config/config.go` and it
 
 ## Houston
 
+* at the moment it is supposed that there is only a single message in each transaction
+
 * aggragated metrics are saved in-memory. Even if a huge amount of transaction should be expected, houston is not saving any transactions details, this means that even if big, aggregated metrics will be magnitude of order lower in memory footprint respect to transaction details.
 
 * it is not persisting data on restart. This is because it is relying on `tx-indexer` which is actually persisting transaction data and which should be considered with the current architecture a single source of truth for the application itself. The limitation is that in case of failures of the application, data are lost and should be processed back from block 1 from the `tx-indexer`, but on the other side they remain perfectly consistent.
@@ -34,9 +36,13 @@ or either data can be inserted in an custom implementation / library for ordered
 
 * to achieve scalability of houston the GraphQL client and the HTTP server can be decoupled and a layer of (internal) persistance should be added.
 This decision should be picked with care to avoid over engineering the architecture of the application itself.
+
 * in order to add more metrics it is enough to add more methods to the interface and to expose the relative HTTP endpoint
+
 * storing metrics in-memory does not scale well, a decision should be taken in the direction of avoid bloating memory.
 On the other hand it should be avoided to introduce a new level of persistence beyond the `tx-indexer`
+
 * data structure employed to model aggregated metrics should be carefully chose. Hash maps are suitable in a demo-like scenario,
 but may become unfit when dealing for example with multiple chains of blocks.
+
 * initial query of per-existing data should be scaled by paginating somehow the requests to `tx-indexer`
