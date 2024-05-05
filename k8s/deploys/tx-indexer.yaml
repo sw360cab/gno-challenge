@@ -16,7 +16,7 @@ spec:
       - name: tx-indexer
         image: sw360cab/aib-tx-indexer
         imagePullPolicy: IfNotPresent
-        args: ["start", "--remote", "http://gnoland-svc:26657", "--db-path", "/opt/indexer-db", "--listen-address", "0.0.0.0:8546"]
+        args: ["start", "--remote", "http://gnoland:26657", "--db-path", "/opt/indexer-db", "--listen-address", "0.0.0.0:8546"]
         volumeMounts:
         - name: indexer-vol
           mountPath: /opt/indexer-db
@@ -39,12 +39,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: tx-indexer-svc
-  labels:
-    run: tx-indexer-svc
+  name: tx-indexer
 spec:
+  selector:
+    app: tx-indexer
   ports:
   - port: 8546
+    targetPort: 8546
     protocol: TCP
-  selector:
-    run: tx-indexer-svc

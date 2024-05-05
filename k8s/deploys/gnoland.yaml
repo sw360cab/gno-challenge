@@ -38,13 +38,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: gnoland-svc
-  labels:
-    run: gnoland-svc
+  name: gnoland
 spec:
+  selector:
+    app: gnoland
   ports:
   - port: 26657
     targetPort: 26657
     protocol: TCP
-  selector:
-    run: gnoland-svc
