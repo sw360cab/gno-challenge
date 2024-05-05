@@ -55,6 +55,6 @@ This decision should be picked with care to avoid over engineering the architect
 * in order to add more metrics it is enough to add more methods to the interface, that will be implemented then, and to expose the relative HTTP endpoints
 
 * data structure employed to model aggregated metrics should be carefully chosen. Hash maps are suitable in a demo-like scenario,
-but may become unfit when dealing for example with multiple chains of blocks
+but may become unfit when dealing for example with multiple chains of blocks. Even transformations at the UI level may be considered
 
 * initial query of pre-existing data should be scaled by paginating somehow the requests to the `tx-indexer`
