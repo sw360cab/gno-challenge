@@ -1,6 +1,7 @@
 # Drifting through the Cosmos
 
 Solution to GNO challenge by Sergio Matone.
+
 The purpose of the challenge is to visually display aggregated data of blockchain transactions.
 
 ![Banner](.github/demo.gif)
@@ -22,7 +23,7 @@ The purpose of the challenge is to visually display aggregated data of blockchai
   ```
 
   This will launch all the services, but `supernova` will fail quite immediately.
-  That is because we will use `supernova` as stress test and launch it multiple times.
+  That is because we will use `supernova` as a stress test and launch it multiple times.
 
 * Launch a stress test
 
@@ -55,9 +56,9 @@ docker compose down -v
 * `gnoland`: Gno.land blockchain node
 * `gnoweb`: Gno.land web interface
 * `tx-indexer`: transaction indexer
-* `supernova`: network activity simulator
-* `houston`: an aggragetor of transaction metrics
-* `grafana`: the dashboard unit using Grafana dashboard
+* `supernova`: stress tests generator
+* `houston`: an ephemeral aggregator of transaction metrics
+* `grafana`: the dashboard UI using Grafana
 
 ## Notes on Houston
 
@@ -65,19 +66,21 @@ docker compose down -v
 
 ## Docker Images related to services
 
+The `houston` image is built in place, all the other images have been prebuilt and pushed in a public registry.
+
 * `sw360cab/aib-gnoland`: `gnoland` image based on
-([Dockerfile in git repo](https://github.com/gnolang/gno/blob/master/Dockerfile)) using code slightly modified. See [details](docs/Assumptions.md#gnoland)
+[Dockerfile](https://github.com/gnolang/gno/blob/master/Dockerfile) in the git repo (using a source code slightly modified. See [details](docs/Assumptions.md#gnoland))
 * `sw360cab/aib-gnoweb`: same as `gnoland`
-* `sw360cab/aib-tx-indexer`: image created using git repo [`Dockerfile`](https://github.com/gnolang/tx-indexer/blob/main/Dockerfile)
-* `sw360cab/aib-supernova`: image created using git repo source code and a custom [Dockerfile](supernova-build/supernova.Dockerfile)
-* `houston`: custom multi-stage `Dockerfile` for Go applications
+* `sw360cab/aib-tx-indexer`: image created using the git repo [`Dockerfile`](https://github.com/gnolang/tx-indexer/blob/main/Dockerfile)
+* `sw360cab/aib-supernova`: image created using the git repo source code and a custom [Dockerfile](supernova-build/supernova.Dockerfile)
+* `houston`: custom multi-stage `Dockerfile` for the Go application
 * `grafana`: official image provided by Grafana
 
 ## Custom configuration
 
-The services are configured to allow customization either via environment variables or more often by specifing additional arguments to the command.
-Specifically in case of `docker compose` this was achieved specifying an `entrypoint` rather than a `command` for each configurable service.
-Moreover to avoid modifying the base `docker-compose.yml` file it is possible to specify a further compose file to be [merged](https://docs.docker.com/compose/multiple-compose-files/merge/)
+The services are configured to allow customization either via environment variables or more often by providing additional arguments to the command.
+Specifically in the case of `docker compose` this was achieved specifying an `entrypoint` rather than a `command` for each configurable service.
+Moreover to avoid modifying the base `docker-compose.yml` file it is possible to specify a further compose file to be [merged](https://docs.docker.com/compose/multiple-compose-files/merge/).
 
 An example file is provided, it can be used directly or as a template for an additional override file. Use it as following:
 
@@ -105,18 +108,18 @@ This can be also imagined as a diagram of communication between each service.
 ## Volumes and networks
 
 * The following volumes are defined
-  * `gnoland-vol`: persists data od `gnoland`
+  * `gnoland-vol`: persists data of `gnoland`
   * `indexer-vol`: persists data of `tx-indexer`
-    * the destination path should correspond in the command line argument of the service
+    * the destination path is reflected in the entrypoint of the service.
   * `grafana-vol`: persists data and configuration of Grafana
-    * it may be not vital because the UI can be rebuilt from scratch each time. It may be useful to persist some customizations of the UI.
+    * it may be not vital because the UI can be rebuilt from scratch each time. But it may be useful to make persistent some customizations of the UI.
 
-* Networks have been the fined with the sole purpose of demostranting that service can run in specific isolated network.
-  * as proof of concepts the dashboard can only access the network where houston is running and it has not any visibility on the other services
+* Networks have been defined with the sole purpose of demonstranting that service can run in specific isolated networks.
+  * as a proof of concept, the dashboard can only access the network where `houston` is running and it has not any visibility on the other services.
 
 ### Ports
 
-Only essential ports are exposed, however for dev purposes more ports may be needed. See [custom configuration](#custom-configuration)
+Only essential ports are exposed, however for dev purposes more ports may be needed. See [custom configuration](#custom-configuration).
 
 ### Secrets
 
@@ -128,7 +131,7 @@ The system is mostly self-healing, here are listed briefly what happens in speci
 
 * Gnoland
   * on restart:
-    * tx-indexer fetch of blocks starts back in a self-heaing way
+    * tx-indexer fetch of blocks starts back in a self-healing way
     * houston is not impacted
   * on stop/removal:
     * tx-indexer is not able to connect but the GraphQL server keeps being available to houston
@@ -136,8 +139,8 @@ The system is mostly self-healing, here are listed briefly what happens in speci
 * Tx-indexer
   * on restart:
     * as soon as new blocks arrives they are processed starting from existing persisted transactions
-    * houston can either timeout its connection to the GraphQL service and crash/restart.
-      * in case of crash it will fetch back all the pre-exising transactions back from tx-indexer
+    * houston can either timeout its connection to the GraphQL service and crash/restart or reconnect transparently.
+      * in case of crash it will fetch back all the pre-existing transactions from tx-indexer
   * on stop/removal: (worst case)
     * houston crashes and restart indefinitely
     * dashboard shows no data
@@ -145,7 +148,7 @@ The system is mostly self-healing, here are listed briefly what happens in speci
 * Houston
   * on restart:
     * dashboard stops fetching data for a while, views are reset as soon as data are fetched again
-    * pre-existing transactions are fetched back from tx-indexer (starting from block 1), as soon as new data arrives on the tx-indexer (see [limitations](docs/Assumptions.md#houston) )
+    * pre-existing transactions are fetched back from tx-indexer (starting from block 1), as soon as new data arrives on the tx-indexer (see [limitations](docs/Assumptions.md#houston))
   * on stop/removal: dashboard is not refreshed anymore, but UI still visible
 
 * Dashboard
@@ -155,3 +158,7 @@ The system is mostly self-healing, here are listed briefly what happens in speci
 ## Assumptions & Limitations
 
 Check out [Assumptions](docs/Assumptions.md)
+
+## Kubernates Configuration (Experimental)
+
+Check out [K8S configuration](k8s/README.md) for a potential setup of a Kubernetes cluster for the given services.
