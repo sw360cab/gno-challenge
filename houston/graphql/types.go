@@ -56,11 +56,11 @@ type SubscriptionGraphQLQuery struct {
 }
 
 type ExistingBlocksGraphQLQuery struct {
-	Transactions []Transaction `graphql:"transactions(filter: { to_block_height: $toBlock })"`
+	Transactions []Transaction `graphql:"transactions(filter: { message : { route: vm }, to_block_height: $toBlock })"`
 }
 
 type LeftoversBlocksGraphQLQuery struct {
-	Transactions []Transaction `graphql:"transactions(filter: { from_block_height: $toBlock, to_block_height: $toBlock, to_index: $toIndex })"`
+	Transactions []Transaction `graphql:"transactions(filter: { message : { route: vm }, from_block_height: $toBlock, to_block_height: $toBlock, to_index: $toIndex })"`
 }
 
 type LastBlockBeforeTimeQuery struct {
