@@ -34,6 +34,8 @@ type TransactionMetricsCollector interface {
 	GetMostActivePackagesDeployed() []SlicedMap
 	// most active packages called
 	GetMostActivePackagesCalled() []SlicedMap
+	// blocks in time series
+	GetBlocksInTimeSeries(gqlClient graphql.GraphQLClient) ([]graphql.Block, error)
 }
 
 type TransactionMetric struct {
@@ -190,4 +192,8 @@ func (tm *TransactionMetric) GetMostActivePackagesDeployed() []SlicedMap {
 
 func (tm *TransactionMetric) GetMostActivePackagesCalled() []SlicedMap {
 	return SortKV(CalledItemsSlicedMapConverter(tm.Packages))
+}
+
+func (tm *TransactionMetric) GetBlocksInTimeSeries(gqlClient graphql.GraphQLClient) ([]graphql.Block, error) {
+	return gqlClient.QueryBlocksOverTime()
 }

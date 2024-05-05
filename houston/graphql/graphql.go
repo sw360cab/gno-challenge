@@ -51,6 +51,17 @@ func (gqlClient *GraphQLClient) createGQLStaticQuery(filterMap map[string]interf
 	return nil
 }
 
+func (gqlClient *GraphQLClient) QueryBlocksOverTime() ([]Block, error) {
+	blocksBeforeTime := &BlocksBeforeTimeQuery{}
+	err := gqlClient.createGQLStaticQuery(map[string]interface{}{
+		"toTime": time.Now(),
+	}, blocksBeforeTime)
+	if err != nil {
+		blocksBeforeTime = &BlocksBeforeTimeQuery{}
+	}
+	return blocksBeforeTime.Blocks, nil
+}
+
 // Handles the request of pre-existing blocks to the GraphQL server given a reference block
 // and a bootstrap time, which defines a limit for the blocks to be queried.
 func (gqlClient *GraphQLClient) QueryPreExistingBlocks(leftoverBlock LeftoversTransactionFilter, bootstapTime time.Time) ([]Transaction, error) {

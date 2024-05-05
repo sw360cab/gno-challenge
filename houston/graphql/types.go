@@ -40,8 +40,9 @@ type Transaction struct {
 }
 
 type Block struct {
-	ChainId string `graphql:"-"` // for future implementation
-	Height  int
+	ChainId string    `json:"-" graphql:"-"` // for future implementations
+	Height  int       `json:"height,omitempty"`
+	Time    time.Time `json:"time,omitempty"`
 }
 
 type SubscriptionResponse struct {
@@ -65,6 +66,10 @@ type LeftoversBlocksGraphQLQuery struct {
 
 type LastBlockBeforeTimeQuery struct {
 	Blocks []Block `graphql:"blocks(filter: { from_height: $fromHeight, to_height: $toHeight, to_time: $toTime })"`
+}
+
+type BlocksBeforeTimeQuery struct {
+	Blocks []Block `graphql:"blocks(filter: { to_time: $toTime })"`
 }
 
 /*******************/
