@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: houston
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: houston
+  template:
+    metadata:
+      labels:
+        app: houston
+    spec:
+      containers:
+      - name: houston
+        image: sw360cab/aib-houston
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: GRAPHQL_URL
+          value: "http://tx-indexer-svc:8546/graphql/query"
+        - name: GIN_MODE
+          value: "release"
+        - name: LOG_LEVEL
+          value: "info"
+        resources:
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
+          requests:
+            cpu: "1000m"
+            memory: "2Gi"

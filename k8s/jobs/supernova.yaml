@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: supernova
+spec:
+  failedJobsHistoryLimit: 3
+  template:
+    metadata:
+      name: supernova
+    spec:
+      containers:
+      - name: supernova
+        image: sw360cab/aib-supernova
+        command: ["./build/supernova"]
+        args: [
+          "-sub-accounts","1",
+          "-transactions","100",
+          "-url","http://gnoland-svc:26657",
+          "-mnemonic", "source bonus chronic canvas draft south burst lottery vacant surface solve popular case indicate oppose farm nothing bullet exhibit title speed wink action roast"
+        ]
+      restartPolicy: Never

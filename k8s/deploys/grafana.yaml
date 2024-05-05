@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      securityContext:
+        runAsUser: 0
+      containers:
+      - name: grafana
+        image: grafana/grafana:10.4.2
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: GF_INSTALL_PLUGINS
+          value: "yesoreyeram-infinity-datasource"
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          value: "/run/secrets/grafana-sec"
+        volumeMounts:
+        - name: grafana-vol
+          mountPath: /var/lib/grafana
+        - name: grafana-secret
+          mountPath: /run/secrets/grafana-sec
+          subPath: grafana.ini
+        - name: grafana-dashboard
+          mountPath: /etc/grafana/provisioning
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+        ports:
+        - containerPort: 3000
+      volumes:
+      - name: grafana-vol
+        persistentVolumeClaim:
+          claimName: grafana-pv-claim
+      - name: grafana-secret
+        secret:
+          secretName: grafana-sec
+      - name: grafana-dashboard
+        configMap:
+          name: dashboard-config
+          items:
+          - key: dashboard.json
+            path: dashboards/gno-dashboard.json
+          - key: dashboard.yaml
+            path: dashboards/gno-dashboard.yaml
+          - key:  datasource.yaml
+            path: datasources/json-datasource.yaml
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+spec:
+  selector:
+    app: grafana
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+  type: NodePort

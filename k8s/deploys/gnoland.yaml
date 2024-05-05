@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gnoland
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gnoland
+  template:
+    metadata:
+      labels:
+        app: gnoland
+    spec:
+      containers:
+      - name: gnoland
+        image: sw360cab/aib-gnoland
+        command: ["gnoland", "start", "--skip-failing-genesis-txs", "--log-level=info"]
+        volumeMounts:
+        - name: gnoland-vol
+          mountPath: /opt/gno/src/gno.land/gnoland-data
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+        ports:
+        - containerPort: 26657
+      volumes:
+      - name: gnoland-vol
+        persistentVolumeClaim:
+          claimName: gnoland-pv-claim
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: gnoland-svc
+  labels:
+    run: gnoland-svc
+spec:
+  ports:
+  - port: 26657
+    targetPort: 26657
+    protocol: TCP
+  selector:
+    run: gnoland-svc
