@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sw360cab/gno-devops/graphql"
 	"github.com/sw360cab/gno-devops/metrics"
 )
 
@@ -14,7 +15,8 @@ type ItemTransaction struct {
 }
 
 type GinRouteHandler struct {
-	Tmc metrics.TransactionMetricsCollector
+	Tmc           metrics.TransactionMetricsCollector
+	GraphQLClient graphql.GraphQLClient
 }
 
 /**********************/
@@ -67,4 +69,12 @@ func (r GinRouteHandler) GetItemsTransctionWithStatus(c *gin.Context) {
 		}
 	}
 	c.JSON(200, handler())
+}
+
+func (r GinRouteHandler) GetBlocksInTimeSeries(c *gin.Context) {
+	blocks, err := r.Tmc.GetBlocksInTimeSeries(r.GraphQLClient)
+	if err != nil {
+		blocks = []graphql.Block{}
+	}
+	c.JSON(200, blocks)
 }

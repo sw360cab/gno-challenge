@@ -21,10 +21,19 @@ func main() {
 	// rdb := initRedisClient()
 	txMetrics := metrics.NewTransactionMetric(logger)
 
+	// GQL Client
+	graphqlEndpoint := utils.GetEnvWithFallback(graphql.GRAPHQL_URL_ENV, graphql.DEFAULT_GRAPHQL_URL)
+	gqlClient := graphql.GraphQLClient{
+		Endpoint:                     graphqlEndpoint,
+		SubscriptionResponseHandler:  txMetrics,
+		SubscriptionConnRetryTimeout: 2 * time.Minute, // configurable if a future version
+	}
+
 	// HTTP Server config
 	ginRouter := gin.Default()
 	ginRouteHanler := router.GinRouteHandler{
-		Tmc: txMetrics,
+		Tmc:           txMetrics,
+		GraphQLClient: gqlClient,
 	}
 	// Dashboard Endpoints
 	ginRouter.GET("/count", ginRouteHanler.GetTransactionCount)
@@ -34,14 +43,7 @@ func main() {
 	// `/realms/(deployed|called)`
 	// `/packages/(deployed|called)`
 	ginRouter.GET("/:type/:status", ginRouteHanler.GetItemsTransctionWithStatus)
-
-	// GQL Client
-	graphqlEndpoint := utils.GetEnvWithFallback(graphql.GRAPHQL_URL_ENV, graphql.DEFAULT_GRAPHQL_URL)
-	gqlClient := graphql.GraphQLClient{
-		Endpoint:                     graphqlEndpoint,
-		SubscriptionResponseHandler:  txMetrics,
-		SubscriptionConnRetryTimeout: 2 * time.Minute, // configurable if a future version
-	}
+	ginRouter.GET("/blocks/timeseries", ginRouteHanler.GetBlocksInTimeSeries)
 
 	// Launch GQL suscription in another GO routine
 	go func() {
