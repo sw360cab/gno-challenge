@@ -15,6 +15,7 @@ spec:
       containers:
       - name: gnoland
         image: sw360cab/aib-gnoland
+        imagePullPolicy: IfNotPresent
         command: ["gnoland", "start", "--skip-failing-genesis-txs", "--log-level=info"]
         volumeMounts:
         - name: gnoland-vol

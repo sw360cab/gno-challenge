@@ -43,13 +43,13 @@ In order to test a minimal setup of a K8s cluster in a local enironment, it may 
 * Generate Config Map with static files
 
   ```bash
-  kubectl apply -k config/configmap
+  kubectl apply -k configmaps/
   ```
 
 * Generate Volumes
 
   ```bash
-  kubectl apply -f config/volumes.yaml
+  kubectl apply -f storage/
   ```
 
 ## Running the cluster
@@ -57,20 +57,16 @@ In order to test a minimal setup of a K8s cluster in a local enironment, it may 
 * Spin up all the services
 
   ```bash
-  kubectl create -f deploys/
+  kubectl apply -f deploys/
   ```
 
 * Run Stress Tests
 
   ```bash
-  kubectl create -f jobs/supernova.yaml
-  ```
-
-* Expose dashboard service manually
-
-  ```bash
-  kubectl port-forward service/grafana 3000:3000
+  kubectl apply -f jobs/supernova.yaml
   ```
 
 * Check out the Grafana dashboard by visiting [http://127.0.0.1:3000/dashboards](http://127.0.0.1:3000/dashboards) and after logging in navigate to the `Gnoland Dashboard`
 (use the password defined into `grafana.ini` file for the `admin` user)
+
+Note: Cluster created using `Kind` is configured to expose port 3000 on control plane host using `extraPortMappings`.

@@ -3,6 +3,7 @@
 ## Design decisions
 
 * it is covered a single _chain id_ at the moment
+* only transaction messages routed to `vm` are considered to make aggrgation metrics easier to verify, however including `bank` routed messages is trivial
 * the current implementation is focusing on processing transaction metrics from block 1
 * it is supposed having a single instance of `tx-indexer` service
 * multiple instances of `gnoland` service are subject to how `tx-indexer` service is able to handle them

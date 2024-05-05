@@ -60,7 +60,6 @@ spec:
     requests:
       storage: 2Gi
 
-
 ---
 # Grafana Volume
 apiVersion: v1

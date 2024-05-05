@@ -6,4 +6,3 @@ configMapGenerator:
   - dashboard.json=grafana/dashboards/gno-dashboard.json
   - dashboard.yaml=grafana/dashboards/gno-dashboard.yaml
   - datasource.yaml=grafana/datasources/json-datasource.yaml
-  - grafana2.ini=grafana2

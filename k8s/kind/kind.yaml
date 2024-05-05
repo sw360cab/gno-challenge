@@ -10,6 +10,6 @@ nodes:
           node-labels: "ingress-ready=true"
           authorization-mode: "AlwaysAllow"
   extraPortMappings:
-    - containerPort: 33000
+    - containerPort: 30001
       hostPort: 3000
 # - role: worker
