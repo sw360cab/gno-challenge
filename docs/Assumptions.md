@@ -34,8 +34,9 @@ with a [custom configuration](../README.md#custom-configuration)
 If `houston` persists metrics in case of fault of the `tx-indexer`, there should be a mechanism that reset the metrics and get them back while the `tx-indexer` rebuilds itself. Whereas in case the `houston` application crashes it will not be possible to verify consistency or data loss if not persisting a reference to the transactions, thus somehow duplicating data already stored in the `tx-indexer`.
 In the future it may be useful to analyze carefully how to address this issue
 
-* the GraphQL client is a POC itself, it should be finely configured to handle reconnection and retries, especially for the subscription part.
-Currently employed GraphQL client library has a configurable retry timeout as long as other connection parameters
+* fetch of pre-existing transactions happens in a very creative but effective way, using go channels and go routines. Upon receiving the very first transaction, the callback of subscription handler _sends_ on the channel where another go routine is blocked, waiting for _receiving_.
+This goroutine is in charge of consuming possible pre-existing transactions and it expires then. It receives the reference to the `block` and the `index` of the transaction currently received, then it takes care of querying directly the GraphQL server for all the blocks up to the current.
+For the current block there is a further request that implies querying this block up to the latest index received. Note that request is handled in a tricky way: the latest block is queried by adding a timestamp to the request as time limit. The timestamp sent corresponds to the bootstrap time of the subscribe event-handler; it is needed because the GraphQL server, which is waking up the subscribers, is sending transactions out-of-order, as soon as they have completed. So the current transaction received is not guaranteed to be the one with the latest index in the current block, but the first that has completed in that block. The timestamp is set as soon as the application subscribes to the GraphQL server and is used as time limit for the block of the first transaction
 
 * data are exposed as a key-value JSON array from the HTTP endpoints. This was made to deal with how Grafana expects to receive data to be shown in the dashboard. the conversion from hasp map to ordered JSON array for each request is expensive and should be improved
 
@@ -57,6 +58,9 @@ This decision should be picked with care to avoid over engineering the architect
 
 * data structure employed to model aggregated metrics should be carefully chosen. Hash maps are suitable in a demo-like scenario,
 but may become unfit when dealing for example with multiple chains of blocks. Even transformations at the UI level may be considered
+
+* the GraphQL client is a POC itself, it should be finely configured to handle reconnection and retries, especially for the subscription part.
+Currently employed GraphQL client library has a configurable retry timeout as long as other connection parameters
 
 * initial query of pre-existing data should be scaled by paginating somehow the requests to the `tx-indexer`
 
