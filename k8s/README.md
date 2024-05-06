@@ -40,7 +40,7 @@ In order to test a minimal setup of a K8s cluster in a local environment, it may
   kubectl apply -k secrets/
   ```
 
-* Generate Config Map with static files
+* Generate Config Map for static config files
 
   ```bash
   kubectl apply -k configmaps/
@@ -66,13 +66,13 @@ In order to test a minimal setup of a K8s cluster in a local environment, it may
   kubectl apply -f jobs/supernova.yaml
   ```
 
-* Check out the Grafana dashboard by visiting [http://127.0.0.1:3000/dashboards](http://127.0.0.1:3000/dashboards) and after logging in navigate to the `Gnoland Dashboard`
+* Check out the Grafana dashboard by visiting [http://127.0.0.1:30000/dashboards](http://127.0.0.1:30000/dashboards) and after logging in navigate to the `Gnoland Dashboard`
 (use the password defined into `grafana.ini` file for the `admin` user)
 
-Note: Cluster created using `Kind` is configured to expose port 3000 on the control plane host using `extraPortMappings`.
-This method may not work _out of the box_ on any host, but it is influenced by the combination of the versions of Docker and Kubernetes.
+Note: Cluster created using `Kind` is configured to expose port 30000 on the control plane host using `extraPortMappings`.
+The port is deliberately picked to work _out of the box_ on any host, but it is influenced by a combination of the versions of Docker and Kubernetes.
 
-* (alternatively) Expose dashboard service manually
+* (alternatively) Expose dashboard service manually and access dashboard at port 3000
 
   ```bash
   kubectl port-forward service/grafana 3000:3000
